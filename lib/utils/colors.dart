@@ -25,6 +25,8 @@ const brandGreySoftColor = Color(0x996D717F);
 const brandGoldColor = Color(0xFFD7A85B);
 const brandGoldDarkColor = Color(0xFFCC893B);
 
+const brandGoldLightColor = Color(0xFFF6F4F0);
+
 const locationBackgroudColor = Color(0XFFE9DFBC);
 const listTitleColor = Color(0XFF6F8C79);
 const tabBarColor = Color(0xFFDDC9C9);

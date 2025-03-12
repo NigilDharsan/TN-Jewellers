@@ -1,4 +1,5 @@
-import 'package:TNJewellers/src/auth/signIn/onboard_screen.dart';
+import 'package:TNJewellers/src/auth/signIn/LoginScreen.dart';
+import 'package:TNJewellers/src/auth/signIn/RegisterScreen.dart';
 import 'package:TNJewellers/src/common/update_screen.dart';
 import 'package:TNJewellers/src/splash/controller/splash_controller.dart';
 import 'package:TNJewellers/src/splash/splash_screen.dart';
@@ -9,7 +10,8 @@ import 'package:get/get.dart';
 class RouteHelper {
   static const String initial = '/';
   static const String splash = '/splash';
-  static const String signIn = '/onboardscreen';
+  static const String signIn = '/loginscreen';
+  static const String register = '/registerscreen';
 
   static const String language = '/language';
   static const String signUp = '/sign-up';
@@ -33,6 +35,8 @@ class RouteHelper {
   static String getSplashRoute() => splash;
   static String getLanguageRoute(String page) => '$language?page=$page';
   static String getSignInRoute() => onBoardScreen;
+  static String getRegisterRoute() => register;
+
   static String getOtpVerifyRoute() => otpVerifyScreen;
   static String getDashBoardRoute() => dashboardscreen;
   static String getProfileRoute() => profilescreen;
@@ -49,7 +53,8 @@ class RouteHelper {
 
   static List<GetPage> routes = [
     GetPage(name: splash, page: () => const SplashScreen()),
-    GetPage(name: onBoardScreen, page: () => getRoute(const OnboardScreen())),
+    GetPage(name: onBoardScreen, page: () => getRoute(const LoginScreen())),
+    GetPage(name: register, page: () => getRoute(RegisterScreen())),
 
     // GetPage(
     //     name: addLocation,

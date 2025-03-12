@@ -42,7 +42,7 @@ class OverlayLoaderWithAppIcon extends StatelessWidget {
                 SizedBox(
                   width: appIconSize,
                   height: appIconSize,
-                  child: Image.asset(Images.logo),
+                  child: Image.asset(Images.logoPng),
                 ),
                 SizedBox(
                   width: appIconSize + 40, // Adjust size to fit inside the logo
