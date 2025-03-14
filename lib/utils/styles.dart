@@ -9,11 +9,19 @@ const appPadding = 16.0;
 const JosefinSansLight = TextStyle(
   fontFamily: 'JosefinSans',
   fontWeight: FontWeight.w300,
+  color: Colors.black,
 );
 
 const JosefinSansRegular = TextStyle(
   fontFamily: 'JosefinSans',
   fontWeight: FontWeight.w400,
+  color: brandPrimaryColor,
+);
+
+const JosefinRegular = TextStyle(
+  fontFamily: 'JosefinSans',
+  fontWeight: FontWeight.w300,
+  color: brandPrimaryColor,
 );
 
 const JosefinSansMedium = TextStyle(

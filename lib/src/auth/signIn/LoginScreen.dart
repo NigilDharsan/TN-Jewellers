@@ -1,3 +1,4 @@
+import 'package:TNJewellers/src/auth/Dashbord/TabScreen.dart';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:TNJewellers/utils/core/helper/route_helper.dart';
 import 'package:TNJewellers/utils/images.dart';
@@ -147,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         onPressed: () {
           if (_formKey.currentState!.validate()) {
-            // Perform login action
+            Get.offAll(TabsScreen());// Perform login action
           }
         },
         child: const Text(
