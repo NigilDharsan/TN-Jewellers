@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../utils/colors.dart';
-import '../../../utils/images.dart';
+
+import '../../utils/colors.dart';
+import '../../utils/images.dart';
 
 class MyOrderScreen extends StatefulWidget {
   const MyOrderScreen({super.key});
@@ -34,7 +35,7 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
         child: SingleChildScrollView(
           child: Padding(
             padding:
-            const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -68,7 +69,7 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
                           child: TextField(
                             decoration: InputDecoration(
                               suffixIcon:
-                              Icon(Icons.search, color: Colors.grey),
+                                  Icon(Icons.search, color: Colors.grey),
                               hintText: 'Search...',
                               hintStyle: TextStyle(color: Colors.grey),
                               border: OutlineInputBorder(

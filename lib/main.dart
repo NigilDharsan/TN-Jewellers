@@ -7,7 +7,6 @@ import 'package:TNJewellers/src/splash/controller/splash_controller.dart';
 import 'package:TNJewellers/utils/app_constants.dart';
 import 'package:TNJewellers/utils/core/theme/controller/theme_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -23,9 +22,9 @@ Future<void> main() async {
   HttpOverrides.global = MyHttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
 
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
+  // SystemChrome.setPreferredOrientations([
+  //   DeviceOrientation.portraitUp,
+  // ]);
 
   runApp(const MyApp());
 }

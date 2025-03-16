@@ -1,21 +1,22 @@
+import 'package:TNJewellers/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:TNJewellers/utils/colors.dart';
 
 import 'dimensions.dart';
 
 const appPadding = 16.0;
 
 const JosefinSansLight = TextStyle(
-  fontFamily: 'JosefinSans',
-  fontWeight: FontWeight.w300,
-  color: Colors.black,
-);
+    fontFamily: 'JosefinSans',
+    fontWeight: FontWeight.w300,
+    color: brandGoldLightColor,
+    fontSize: 10);
 
 const JosefinSansRegular = TextStyle(
   fontFamily: 'JosefinSans',
   fontWeight: FontWeight.w400,
-  color: brandPrimaryColor,
+  color: brandGreyColor,
+  fontSize: 15,
 );
 
 const JosefinRegular = TextStyle(
@@ -32,20 +33,58 @@ const JosefinSansMedium = TextStyle(
 const JosefinSansBold = TextStyle(
   fontFamily: 'JosefinSans',
   fontWeight: FontWeight.w700,
+  color: brandPrimaryColor,
+  fontSize: 18,
 );
 
 const JosefinSansSemiBold = TextStyle(
   fontFamily: 'JosefinSans',
   fontWeight: FontWeight.w600,
+  fontSize: 12,
+  color: Colors.white,
 );
 
+const JosefinSansSemiBold1 = TextStyle(
+  fontFamily: 'JosefinSans',
+  fontWeight: FontWeight.w600,
+  fontSize: 10,
+  color: Colors.white,
+);
+
+const headerTitle = TextStyle(
+  fontFamily: 'JosefinSans',
+  fontWeight: FontWeight.w700,
+  color: brandGreyColor,
+  fontSize: 20,
+);
 //List Number
-TextStyle List_No = TextStyle(
-    fontFamily: 'JosefinSans',
-    fontSize: 18,
-    color: Color.fromRGBO(0, 0, 0, 1),
-    fontWeight: FontWeight.w300,
-    fontStyle: FontStyle.italic);
+TextStyle spanList = TextStyle(
+  fontFamily: 'JosefinSans',
+  fontSize: 8,
+  color: Color.fromRGBO(255, 255, 255, 1),
+  fontWeight: FontWeight.w400,
+);
+
+TextStyle categoryTitle = TextStyle(
+  fontFamily: 'JosefinSans',
+  fontSize: 8,
+  color: brandGreyColor,
+  fontWeight: FontWeight.w700,
+);
+
+TextStyle splTextTitle = TextStyle(
+  fontFamily: 'JosefinSans',
+  fontSize: 6,
+  color: brandPrimaryColor,
+  fontWeight: FontWeight.w700,
+);
+
+TextStyle productName = TextStyle(
+  fontFamily: 'JosefinSans',
+  fontSize: 10,
+  color: brandPrimaryColor,
+  fontWeight: FontWeight.w700,
+);
 
 TextStyle List_No_noItaqlic = TextStyle(
     fontFamily: 'JosefinSans',

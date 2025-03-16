@@ -12,6 +12,9 @@ class Images {
   static String get backgroundImgLogo => 'background_img_logo'.png;
   static String get backgroundImgLogo1 => 'background_img_logo1'.png;
   static String get user => 'user'.png;
+  static String get banner => 'banner'.png;
+  static String get product_ear_ring => 'product_ear_ring'.png;
+  static String get rightArrow => 'right_arrow'.png;
 
   static String get money => 'money'.png;
   static String get clock => 'clock'.png;
@@ -24,7 +27,7 @@ class Images {
   static String get guest => 'guest'.png;
 
   static String get notification => 'notification'.svg;
-  static String get search => 'search'.svg;
+  static String get search => 'search'.png;
 
   static String get chat => 'chat'.svg;
 
