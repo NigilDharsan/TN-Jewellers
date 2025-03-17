@@ -3,6 +3,7 @@ import 'package:TNJewellers/src/Product/ProductScreen.dart';
 import 'package:TNJewellers/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../../utils/colors.dart';
 import '../../utils/images.dart';
 
@@ -154,7 +155,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     },
                     children: [
                       Image.asset(Images.banner,
-                          width: double.infinity, fit: BoxFit.cover),
+                          width: double.infinity, fit: BoxFit.fill),
                       Image.asset(Images.banner,
                           width: double.infinity, fit: BoxFit.cover),
                       Image.asset(Images.banner,
@@ -184,16 +185,13 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
                 SizedBox(height: 20),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height / 3,
+                  height: (6 / 2) * 155,
                   // Adjusts height to 40% of screen height
                   child: GridView.builder(
                     physics: NeverScrollableScrollPhysics(),
-                    itemCount: 4,
+                    itemCount: 6,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: (MediaQuery.of(context).orientation ==
-                              Orientation.portrait)
-                          ? 2
-                          : 3,
+                      crossAxisCount: 2,
                       childAspectRatio:
                           4 / 3.2, // 2 for portrait, 3 for landscape
                       crossAxisSpacing: 5, // Space between columns
@@ -203,7 +201,7 @@ class _MenuScreenState extends State<MenuScreen> {
                       return index == 0
                           ? Container(
                               margin: EdgeInsets.all(1),
-                              padding: EdgeInsets.all(5),
+                              padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
                                 color: brandPrimaryColor,
                               ),
@@ -359,8 +357,7 @@ Widget GridViewCartDesign(Color backgroundColor, String title,
     IconData titleIcon, String subTitle, String subTitle1, String subTitle2) {
   return Container(
     margin: EdgeInsets.all(0),
-    width: 200,
-    padding: EdgeInsets.all(1),
+    padding: EdgeInsets.all(10),
     decoration: BoxDecoration(
       color: backgroundColor,
     ),
@@ -392,6 +389,7 @@ Widget GridViewCartDesign(Color backgroundColor, String title,
         ),
         SizedBox(height: 5),
         Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Expanded(
               child: Column(
@@ -427,14 +425,11 @@ Widget GridViewCartDesign(Color backgroundColor, String title,
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(3),
-              child: InkWell(
-                onTap: () {
-                  Get.to(ProductScreen());
-                },
-                child: Image.asset(Images.rightArrow),
-              ),
+            InkWell(
+              onTap: () {
+                Get.to(ProductScreen());
+              },
+              child: Image.asset(Images.rightArrow),
             ),
           ],
         ),

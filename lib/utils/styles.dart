@@ -8,7 +8,7 @@ const appPadding = 16.0;
 
 const JosefinSansLight = TextStyle(
     fontFamily: 'JosefinSans',
-    fontWeight: FontWeight.bold,
+    fontWeight: FontWeight.w300,
     color: brandGoldLightColor,
     fontSize: 10);
 
@@ -53,7 +53,7 @@ const JosefinSansBold = TextStyle(
 
 const JosefinSansSemiBold = TextStyle(
   fontFamily: 'JosefinSans',
-  fontWeight: FontWeight.bold,
+  fontWeight: FontWeight.w600,
   fontSize: 12,
   color: Colors.white,
 );
@@ -87,7 +87,7 @@ const headerTitle = TextStyle(
 //List Number
 TextStyle spanList = TextStyle(
   fontFamily: 'JosefinSans',
-  fontSize: 10,
+  fontSize: 8,
   color: Color.fromRGBO(255, 255, 255, 1),
   fontWeight: FontWeight.w400,
 );
@@ -101,15 +101,29 @@ TextStyle categoryTitle = TextStyle(
 
 TextStyle splTextTitle = TextStyle(
   fontFamily: 'JosefinSans',
-  fontSize: 8,
+  fontSize: 6,
   color: brandPrimaryColor,
-  fontWeight: FontWeight.bold,
+  fontWeight: FontWeight.w700,
 );
 
 TextStyle productName = TextStyle(
   fontFamily: 'JosefinSans',
   fontSize: 10,
   color: brandPrimaryColor,
+  fontWeight: FontWeight.w700,
+);
+
+TextStyle favorite_title = TextStyle(
+  fontFamily: 'JosefinSans',
+  fontSize: 7,
+  color: Color.fromRGBO(255, 255, 255, 1),
+  fontWeight: FontWeight.w600,
+);
+
+TextStyle favorite_Subtitle = TextStyle(
+  fontFamily: 'JosefinSans',
+  fontSize: 10,
+  color: Color.fromRGBO(255, 255, 255, 1),
   fontWeight: FontWeight.w700,
 );
 

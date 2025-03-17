@@ -1,6 +1,6 @@
 import 'package:TNJewellers/utils/colors.dart';
-import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 
 class Orderbasicscreen extends StatefulWidget {
   const Orderbasicscreen({super.key});
@@ -17,7 +17,8 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
   int currentStep = 1;
 
   void pickAudioFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.audio);
+    FilePickerResult? result =
+        await FilePicker.platform.pickFiles(type: FileType.audio);
     if (result != null) {
       setState(() {
         audioFile = result.files.single.name;
@@ -46,7 +47,8 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text('Create Order', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            Text('Create Order',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -55,18 +57,19 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                   child: Column(
                     children: [
                       CircleAvatar(
-                        backgroundColor: currentStep == 1 ? brandPrimaryColor : Colors.grey,
+                        backgroundColor:
+                            currentStep == 1 ? brandPrimaryColor : Colors.grey,
                         child: Text('1', style: TextStyle(color: Colors.white)),
                       ),
                     ],
                   ),
                 ),
-
                 Expanded(
                   child: Column(
                     children: [
                       CircleAvatar(
-                        backgroundColor: currentStep == 2 ? brandPrimaryColor : Colors.grey,
+                        backgroundColor:
+                            currentStep == 2 ? brandPrimaryColor : Colors.grey,
                         child: Text('2', style: TextStyle(color: Colors.white)),
                       ),
                     ],
@@ -76,7 +79,8 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                   child: Column(
                     children: [
                       CircleAvatar(
-                        backgroundColor: currentStep == 3 ? brandPrimaryColor : Colors.grey,
+                        backgroundColor:
+                            currentStep == 3 ? brandPrimaryColor : Colors.grey,
                         child: Text('3', style: TextStyle(color: Colors.white)),
                       ),
                     ],
@@ -91,7 +95,9 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                 child: Column(
                   children: [
                     TextFormField(
-                      decoration: InputDecoration(labelText: 'First Name', border: OutlineInputBorder()),
+                      decoration: InputDecoration(
+                          labelText: 'First Name',
+                          border: OutlineInputBorder()),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your first name';
@@ -101,7 +107,8 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                     ),
                     SizedBox(height: 10),
                     DropdownButtonFormField(
-                      decoration: InputDecoration(labelText: 'Type', border: OutlineInputBorder()),
+                      decoration: InputDecoration(
+                          labelText: 'Type', border: OutlineInputBorder()),
                       items: ['Type1', 'Type2'].map((type) {
                         return DropdownMenuItem(value: type, child: Text(type));
                       }).toList(),
@@ -121,7 +128,8 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
               Column(
                 children: [
                   DropdownButtonFormField(
-                    decoration: InputDecoration(labelText: 'Material', border: OutlineInputBorder()),
+                    decoration: InputDecoration(
+                        labelText: 'Material', border: OutlineInputBorder()),
                     items: ['Material1', 'Material2'].map((mat) {
                       return DropdownMenuItem(value: mat, child: Text(mat));
                     }).toList(),
@@ -135,10 +143,14 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                   Container(
                     color: Colors.green,
                     padding: EdgeInsets.all(10),
-                    child: Center(child: Text('Summarize', style: TextStyle(color: Colors.white, fontSize: 18))),
+                    child: Center(
+                        child: Text('Summarize',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 18))),
                   ),
                   SizedBox(height: 20),
-                  ElevatedButton(onPressed: previousStep, child: Text('Previous')),
+                  ElevatedButton(
+                      onPressed: previousStep, child: Text('Previous')),
                   ElevatedButton(onPressed: nextStep, child: Text('Next')),
                 ],
               ),
@@ -146,14 +158,17 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
             if (currentStep == 3) ...[
               Column(
                 children: [
-                  ElevatedButton(onPressed: pickAudioFile, child: Text('Upload Latest Audio File')),
+                  ElevatedButton(
+                      onPressed: pickAudioFile,
+                      child: Text('Upload Latest Audio File')),
                   if (audioFile != null) ...[
                     Text('Audio File: $audioFile'),
                     IconButton(icon: Icon(Icons.play_arrow), onPressed: () {}),
                     IconButton(icon: Icon(Icons.download), onPressed: () {}),
                   ],
                   SizedBox(height: 20),
-                  ElevatedButton(onPressed: previousStep, child: Text('Previous')),
+                  ElevatedButton(
+                      onPressed: previousStep, child: Text('Previous')),
                 ],
               ),
             ],
@@ -163,5 +178,3 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
     );
   }
 }
-
-

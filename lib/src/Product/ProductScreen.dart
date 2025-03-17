@@ -94,31 +94,31 @@ class _ProductScreenState extends State<ProductScreen> {
                             color: Colors.white)),
                   ),
                   SizedBox(width: 5),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: brandGreyColor,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text("22K",
-                        style: TextStyle(
-                            fontWeight: FontWeight.normal,
-                            fontSize: 10,
-                            color: Colors.white)),
-                  ),
-                  SizedBox(width: 5),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: brandGreyColor,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text("24K",
-                        style: TextStyle(
-                            fontWeight: FontWeight.normal,
-                            fontSize: 10,
-                            color: Colors.white)),
-                  ),
+                  // Container(
+                  //   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  //   decoration: BoxDecoration(
+                  //     color: brandGreyColor,
+                  //     borderRadius: BorderRadius.circular(5),
+                  //   ),
+                  //   child: Text("22K",
+                  //       style: TextStyle(
+                  //           fontWeight: FontWeight.normal,
+                  //           fontSize: 10,
+                  //           color: Colors.white)),
+                  // ),
+                  // SizedBox(width: 5),
+                  // Container(
+                  //   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  //   decoration: BoxDecoration(
+                  //     color: brandGreyColor,
+                  //     borderRadius: BorderRadius.circular(5),
+                  //   ),
+                  //   child: Text("24K",
+                  //       style: TextStyle(
+                  //           fontWeight: FontWeight.normal,
+                  //           fontSize: 10,
+                  //           color: Colors.white)),
+                  // ),
                 ],
               ),
             ],
@@ -205,31 +205,31 @@ class _ProductScreenState extends State<ProductScreen> {
                               color: Colors.white)),
                     ),
                     SizedBox(width: 5),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: brandGreyColor,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Text("22K",
-                          style: TextStyle(
-                              fontWeight: FontWeight.normal,
-                              fontSize: 10,
-                              color: Colors.white)),
-                    ),
-                    SizedBox(width: 5),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: brandGreyColor,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Text("24K",
-                          style: TextStyle(
-                              fontWeight: FontWeight.normal,
-                              fontSize: 10,
-                              color: Colors.white)),
-                    ),
+                    // Container(
+                    //   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    //   decoration: BoxDecoration(
+                    //     color: brandGreyColor,
+                    //     borderRadius: BorderRadius.circular(5),
+                    //   ),
+                    //   child: Text("22K",
+                    //       style: TextStyle(
+                    //           fontWeight: FontWeight.normal,
+                    //           fontSize: 10,
+                    //           color: Colors.white)),
+                    // ),
+                    // SizedBox(width: 5),
+                    // Container(
+                    //   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    //   decoration: BoxDecoration(
+                    //     color: brandGreyColor,
+                    //     borderRadius: BorderRadius.circular(5),
+                    //   ),
+                    //   child: Text("24K",
+                    //       style: TextStyle(
+                    //           fontWeight: FontWeight.normal,
+                    //           fontSize: 10,
+                    //           color: Colors.white)),
+                    // ),
                   ],
                 ),
                 SizedBox(height: 5),
@@ -286,7 +286,9 @@ class _ProductScreenState extends State<ProductScreen> {
                           // Set the hint text color
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6),
-                            borderSide: BorderSide(color: Colors.transparent), // Makes the border invisible
+                            borderSide: BorderSide(
+                                color: Colors
+                                    .transparent), // Makes the border invisible
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6),

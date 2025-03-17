@@ -1,11 +1,8 @@
 import 'package:TNJewellers/src/Dashbord/OderScreen/OrderbasicScreen.dart';
-import 'package:TNJewellers/src/Product/ProductScreen.dart';
 import 'package:TNJewellers/utils/colors.dart';
-import 'package:TNJewellers/utils/images.dart';
 import 'package:TNJewellers/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 class FavoriteViewScreen extends StatefulWidget {
   const FavoriteViewScreen({super.key});
@@ -32,8 +29,7 @@ class _FavoriteViewScreenState extends State<FavoriteViewScreen> {
               Get.back();
             }),
         title: Text(
-          "SOUTH INDIAN...",
-          style: headerTitle,
+          "SOUTH INDIAN BANGLE",
         ),
         actions: [
           IconButton(
@@ -107,6 +103,9 @@ class _FavoriteViewScreenState extends State<FavoriteViewScreen> {
                       ],
                     ),
                   ),
+                  SizedBox(
+                    width: 20,
+                  ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -120,6 +119,9 @@ class _FavoriteViewScreenState extends State<FavoriteViewScreen> {
                         style: smallSemiBold,
                       ),
                     ],
+                  ),
+                  SizedBox(
+                    width: 20,
                   ),
                 ],
               ),
