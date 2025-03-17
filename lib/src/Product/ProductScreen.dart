@@ -282,14 +282,11 @@ class _ProductScreenState extends State<ProductScreen> {
                         decoration: InputDecoration(
                           suffixIcon: Image.asset(Images.search),
                           hintText: 'Search...',
-                          hintStyle: TextStyle(
-                              color: brandGreyColor), // Set the hint text color
-
+                          hintStyle: TextStyle(color: brandGreyColor),
+                          // Set the hint text color
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6),
-                            borderSide: BorderSide(
-                                color: Colors
-                                    .transparent), // Makes the border invisible
+                            borderSide: BorderSide(color: Colors.transparent), // Makes the border invisible
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6),
@@ -370,7 +367,6 @@ class _ProductScreenState extends State<ProductScreen> {
               SizedBox(width: 10),
             ],
           ),
-
           // Product List/Grid
           Expanded(
             child: isGridView

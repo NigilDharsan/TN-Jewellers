@@ -51,7 +51,8 @@ dependencies:
   path:
   path_provider: 
   permission_handler: 
-  shared_preferences: 
+  shared_preferences:
+  file_picker:
 
   geolocator:
   url_launcher:

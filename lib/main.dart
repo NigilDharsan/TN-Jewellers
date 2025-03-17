@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:ui';
-
 import 'package:TNJewellers/Utils/core/helper/route_helper.dart';
 import 'package:TNJewellers/Utils/core/initial_binding/initial_binding.dart';
 import 'package:TNJewellers/src/splash/controller/splash_controller.dart';
@@ -9,19 +8,15 @@ import 'package:TNJewellers/utils/core/theme/controller/theme_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-
 import 'utils/core/theme/dark_theme.dart';
 import 'utils/core/theme/light_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   initControllers();
-
   await GetStorage.init();
   HttpOverrides.global = MyHttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
-
   // SystemChrome.setPreferredOrientations([
   //   DeviceOrientation.portraitUp,
   // ]);
@@ -46,11 +41,9 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
-    // Clean up lifecycle observer when widget is disposed
     super.dispose();
   }
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return GetBuilder<ThemeController>(builder: (themeController) {

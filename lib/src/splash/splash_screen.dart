@@ -22,7 +22,6 @@ class SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
     // bool firstTime = true;
     // _onConnectivityChanged = Connectivity()
     //     .onConnectivityChanged

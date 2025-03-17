@@ -18,10 +18,10 @@ class RouteHelper {
   static const String signUpEstablish = '/sign-up-establish';
   static const String addLocation = '/add-location';
   static const String onBoardScreen = '/onboard-screen';
-  static const String otpVerifyScreen = '/otpVerifyScreen';
+  static const String favoriteScreen = '/favoriteScreen';
   static const String dashboardscreen = '/dashboardscreen';
   static const String profilescreen = '/profilescreen';
-  static const String editprofilescreen = '/editprofilescreen';
+  static const String orderbasicscreen = '/orderscreen';
 
   static const String riderhistoryscreen = '/riderhistoryscreen';
   static const String ridecompletedetails = '/ridecompletedetails';
@@ -37,10 +37,10 @@ class RouteHelper {
   static String getSignInRoute() => onBoardScreen;
   static String getRegisterRoute() => register;
 
-  static String getOtpVerifyRoute() => otpVerifyScreen;
+  static String getFavoriteViewScreen() =>favoriteScreen;
   static String getDashBoardRoute() => dashboardscreen;
   static String getProfileRoute() => profilescreen;
-  static String getEditProfileRoute() => editprofilescreen;
+  static String getOrderbasicscreenRoute() => orderbasicscreen;
   static String getRiderHistoryRoute() => riderhistoryscreen;
   static String getRideCompleteDetailsRoute() => ridecompletedetails;
   static String getChooseMapRoute() => choosemapscreen;

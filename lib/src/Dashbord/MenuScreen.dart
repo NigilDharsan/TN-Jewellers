@@ -1,8 +1,8 @@
+import 'package:TNJewellers/src/Dashbord/DrawerPage.dart';
 import 'package:TNJewellers/src/Product/ProductScreen.dart';
 import 'package:TNJewellers/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../../utils/colors.dart';
 import '../../utils/images.dart';
 
@@ -15,8 +15,7 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen> {
   final PageController _pageController = PageController();
-  int _currentPage = 0;
-  int selectedIndex = -1;
+  int _currentPage = -1;
 
   final List<String> Stocks = [
     "EAR RINGS",
@@ -26,7 +25,7 @@ class _MenuScreenState extends State<MenuScreen> {
     "KARAT"
   ];
   final List<Map<String, dynamic>> demo = [
-    {"name": "Jewelry", "image": "assets/images/jewelly.jpg"},
+    {"name": "Jewellery", "image": "assets/images/jewelly.jpg"},
     {"name": "Necklace", "image": "assets/images/jewelly.jpg"},
     {"name": "Bangles", "image": "assets/images/jewelly.jpg"},
     {"name": "Diamond", "image": "assets/images/jewelly.jpg"},
@@ -45,8 +44,39 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        // Set background color
+        elevation: 0,
+        // Remove shadow
+        iconTheme: IconThemeData(color: Colors.black),
+        // Drawer icon color
+        toolbarHeight: 100,
+        // Set AppBar height
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Welcome',
+                    style: JosefinSansRegular, textScaleFactor: 0.8),
+                SizedBox(height: 3), // Reduce spacing for small height
+                Text('ARTISA JEWELLERS',
+                    style: JosefinSansBold, textScaleFactor: 0.8),
+              ],
+            ),
+            Image.asset(
+              Images.logoPng,
+              width: 60, // Reduce image width for smaller AppBar
+              height: 60,
+              fit: BoxFit.contain,
+            ),
+          ],
+        ),
+      ),
+      drawer: DrawerPage(),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -54,26 +84,6 @@ class _MenuScreenState extends State<MenuScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header Section
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Welcome', style: JosefinSansRegular),
-                        SizedBox(height: 5),
-                        Text('ARTISA JEWELLERS', style: JosefinSansBold),
-                      ],
-                    ),
-                    Image.asset(
-                      Images.logoPng,
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.contain,
-                    ),
-                  ],
-                ),
                 SizedBox(height: 20),
                 Row(
                   children: [
@@ -85,10 +95,8 @@ class _MenuScreenState extends State<MenuScreen> {
                             decoration: InputDecoration(
                               suffixIcon: Image.asset(Images.search),
                               hintText: 'Search...',
-                              hintStyle: TextStyle(
-                                  color:
-                                      brandGreyColor), // Set the hint text color
-
+                              hintStyle: TextStyle(color: brandGreyColor),
+                              // Set the hint text color
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6),
                                 borderSide: BorderSide(
@@ -136,7 +144,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
                 SizedBox(height: 20),
                 SizedBox(
-                  height: 161,
+                  height: 180,
                   child: PageView(
                     controller: _pageController,
                     onPageChanged: (int page) {
@@ -145,10 +153,14 @@ class _MenuScreenState extends State<MenuScreen> {
                       });
                     },
                     children: [
-                      Image.asset(Images.banner, fit: BoxFit.cover),
-                      Image.asset(Images.banner, fit: BoxFit.cover),
-                      Image.asset(Images.banner, fit: BoxFit.cover),
-                      Image.asset(Images.banner, fit: BoxFit.cover),
+                      Image.asset(Images.banner,
+                          width: double.infinity, fit: BoxFit.cover),
+                      Image.asset(Images.banner,
+                          width: double.infinity, fit: BoxFit.cover),
+                      Image.asset(Images.banner,
+                          width: double.infinity, fit: BoxFit.cover),
+                      Image.asset(Images.banner,
+                          width: double.infinity, fit: BoxFit.cover),
                     ],
                   ),
                 ),
@@ -171,12 +183,9 @@ class _MenuScreenState extends State<MenuScreen> {
                   ),
                 ),
                 SizedBox(height: 20),
-
-                // GridView Section
-
                 SizedBox(
-                  height: MediaQuery.of(context).size.height /
-                      3, // Adjusts height to 40% of screen height
+                  height: MediaQuery.of(context).size.height / 3,
+                  // Adjusts height to 40% of screen height
                   child: GridView.builder(
                     physics: NeverScrollableScrollPhysics(),
                     itemCount: 4,
@@ -187,21 +196,20 @@ class _MenuScreenState extends State<MenuScreen> {
                           : 3,
                       childAspectRatio:
                           4 / 3.2, // 2 for portrait, 3 for landscape
-                      // Adjust the aspect ratio of each item
                       crossAxisSpacing: 5, // Space between columns
                       mainAxisSpacing: 5, // Space between rows
                     ),
                     itemBuilder: (BuildContext context, int index) {
                       return index == 0
                           ? Container(
-                              margin: EdgeInsets.all(5),
-                              padding: EdgeInsets.all(10),
+                              margin: EdgeInsets.all(1),
+                              padding: EdgeInsets.all(5),
                               decoration: BoxDecoration(
                                 color: brandPrimaryColor,
                               ),
                               child: Column(
-                                mainAxisSize: MainAxisSize
-                                    .min, // Prevents extra space issues
+                                mainAxisSize: MainAxisSize.min,
+                                // Prevents extra space issues
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
@@ -217,12 +225,12 @@ class _MenuScreenState extends State<MenuScreen> {
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 5),
+                                  SizedBox(height: 2),
                                   Text(
                                     'Your customers love these!',
                                     style: JosefinSansLight,
                                   ),
-                                  SizedBox(height: 5),
+                                  SizedBox(height: 2),
                                   Row(
                                     children: [
                                       Expanded(
@@ -231,9 +239,9 @@ class _MenuScreenState extends State<MenuScreen> {
                                           style: spanList,
                                         ),
                                       ),
-                                      SizedBox(width: 10),
+                                      SizedBox(width: 8),
                                       CircleAvatar(
-                                        radius: 30,
+                                        radius: 25,
                                         backgroundColor: Colors.white,
                                         child: Padding(
                                           padding: EdgeInsets.all(7),
@@ -264,7 +272,8 @@ class _MenuScreenState extends State<MenuScreen> {
                                       Icons.shopping_cart,
                                       'Browse Now',
                                       'Stay in Trend',
-                                      'Stock the Best!')
+                                      'Stock the Best!',
+                                    )
                                   : GridViewCartDesign(
                                       brandGreyColor,
                                       'SHOWCASE.\nSELL MORE.\nRISK-FREE',
@@ -275,7 +284,6 @@ class _MenuScreenState extends State<MenuScreen> {
                     },
                   ),
                 ),
-
                 SizedBox(height: 20),
                 Text('BROWSER BY JEWEL TYPE',
                     style:
@@ -350,9 +358,9 @@ class _MenuScreenState extends State<MenuScreen> {
 Widget GridViewCartDesign(Color backgroundColor, String title,
     IconData titleIcon, String subTitle, String subTitle1, String subTitle2) {
   return Container(
-    margin: EdgeInsets.all(5),
-    width: 180,
-    padding: EdgeInsets.all(10),
+    margin: EdgeInsets.all(0),
+    width: 200,
+    padding: EdgeInsets.all(1),
     decoration: BoxDecoration(
       color: backgroundColor,
     ),
@@ -384,7 +392,6 @@ Widget GridViewCartDesign(Color backgroundColor, String title,
         ),
         SizedBox(height: 5),
         Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Expanded(
               child: Column(
@@ -393,14 +400,14 @@ Widget GridViewCartDesign(Color backgroundColor, String title,
                   Row(
                     children: [
                       Icon(Icons.diamond, color: Colors.white, size: 20),
-                      SizedBox(width: 5),
+                      SizedBox(width: 1),
                       Text(subTitle, style: JosefinSansLight),
                     ],
                   ),
                   Row(
                     children: [
                       Icon(Icons.diamond, color: Colors.blue, size: 20),
-                      SizedBox(width: 5),
+                      SizedBox(width: 1),
                       Text(
                         subTitle1,
                         style: JosefinSansLight,
@@ -410,7 +417,7 @@ Widget GridViewCartDesign(Color backgroundColor, String title,
                   Row(
                     children: [
                       Icon(Icons.diamond, color: Colors.red, size: 20),
-                      SizedBox(width: 5),
+                      SizedBox(width: 1),
                       Text(
                         subTitle2,
                         style: JosefinSansLight,
@@ -420,11 +427,12 @@ Widget GridViewCartDesign(Color backgroundColor, String title,
                 ],
               ),
             ),
-            InkWell(
-              onTap: () {
-                Get.to(ProductScreen());
-              },
-              child: Container(
+            Padding(
+              padding: const EdgeInsets.all(3),
+              child: InkWell(
+                onTap: () {
+                  Get.to(ProductScreen());
+                },
                 child: Image.asset(Images.rightArrow),
               ),
             ),

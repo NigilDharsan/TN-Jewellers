@@ -1,5 +1,7 @@
+import 'package:TNJewellers/utils/images.dart';
+import 'package:TNJewellers/utils/styles.dart';
 import 'package:flutter/material.dart';
-
+import 'DrawerPage.dart';
 import 'CartScreen.dart';
 import 'FavoriteScreen.dart';
 import 'MenuScreen.dart';
@@ -13,13 +15,6 @@ class TabsScreen extends StatefulWidget {
 }
 
 class _TabsScreenState extends State<TabsScreen> {
-  final List<Widget> _pages = [
-    const MenuScreen(),
-    const MyOrderScreen(),
-    const FavoriteScreen(),
-    const CartScreen(),
-  ];
-
   int _selectedPageIndex = 0;
 
   void _selectPage(int index) {
@@ -31,7 +26,16 @@ class _TabsScreenState extends State<TabsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedPageIndex],
+
+      body: IndexedStack(
+        index: _selectedPageIndex,
+        children: const [
+          MenuScreen(),
+          MyOrderScreen(),
+          FavoriteScreen(),
+          CartScreen(),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: _selectPage,
         currentIndex: _selectedPageIndex,
@@ -41,22 +45,18 @@ class _TabsScreenState extends State<TabsScreen> {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.menu),
-            activeIcon: Icon(Icons.menu),
             label: 'MENU',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.card_travel),
-            activeIcon: Icon(Icons.card_travel),
             label: 'MY ORDER',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite_border),
-            activeIcon: Icon(Icons.favorite),
             label: 'FAVORITE',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
-            activeIcon: Icon(Icons.shopping_cart),
             label: 'CART',
           ),
         ],
