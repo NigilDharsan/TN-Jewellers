@@ -26,6 +26,14 @@ const DrawerJosefinSansRegular = TextStyle(
   fontSize: 15,
 );
 
+const Order2 = TextStyle(
+  fontFamily: 'JosefinSans',
+  fontWeight: FontWeight.bold,
+  color: textColor,
+  fontSize: 12,
+);
+
+
 const jewellery = TextStyle(
   fontFamily: 'JosefinSans',
   fontWeight: FontWeight.bold,
