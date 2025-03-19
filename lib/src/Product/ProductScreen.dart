@@ -150,7 +150,7 @@ class _ProductScreenState extends State<ProductScreen> {
           ClipRRect(
             borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
             child: Image.asset(Images.product_ear_ring,
-                width: double.infinity, height: 120, fit: BoxFit.cover),
+                width: double.infinity, height: 80, fit: BoxFit.cover),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),

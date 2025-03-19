@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:TNJewellers/utils/styles.dart';
 import 'package:flutter/material.dart';
@@ -18,32 +19,56 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
   final TextEditingController widthController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
   final TextEditingController stoneWeightController = TextEditingController();
+  final TextEditingController inputController = TextEditingController();
+
   int currentStep = 2;
   String? selectedProduct;
   String? selectedMaterial;
   String? selectedDiamond;
   String? selectedStone;
   String? selectedquantity;
-  DateTime? selectedDate;
   int calculatedDays = 0;
+  Timer? _timer;
+  bool isDateDisplayed = false;
 
-  Future<void> _selectDate(BuildContext context) async {
-    DateTime today = DateTime.now();
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: today,
-      firstDate: today,
-      lastDate: today.add(Duration(days: 365)), // Limit to 1 year ahead
-    );
-
-    if (picked != null && picked != selectedDate) {
+  void _startConversionTimer(String value) {
+    _timer?.cancel(); // Cancel previous timer if any
+    if (value.isEmpty) {
       setState(() {
-        selectedDate = picked;
-        calculatedDays = picked.difference(today).inDays; // Calculate days from today
+        isDateDisplayed = false; // Reset state when text is cleared
+      });
+      return;
+    }
+    int? daysToAdd = int.tryParse(value);
+    if (daysToAdd != null && daysToAdd > 0) {
+      _timer = Timer(Duration(seconds: 2), () {
+        DateTime futureDate = DateTime.now().add(Duration(days: daysToAdd));
+        String formattedDate = DateFormat('yyyy-MM-dd').format(futureDate);
+        setState(() {
+          inputController.text = formattedDate;
+          isDateDisplayed = true;
+        });
+      });
+    } else {
+      setState(() {
+        isDateDisplayed = false;
       });
     }
   }
 
+  void _clearInput() {
+    setState(() {
+      inputController.clear();
+      isDateDisplayed = false;
+    });
+    _timer?.cancel(); // Cancel any running timer
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // Clean up the timer
+    super.dispose();
+  }
 
   void nextStep() {
     Get.to(() => const OrderScreenThree());
@@ -127,7 +152,7 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
                     'ORDER QUANTITY',
                     ['2 Pieces', '3 Pieces'],
                     selectedquantity,
-                        (value) {
+                    (value) {
                       setState(() => selectedquantity = value);
                     },
                   ),
@@ -143,9 +168,9 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
                       ),
                       SizedBox(height: 5),
                       GestureDetector(
-                        onTap: () => _selectDate(context),
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 12, vertical: 0),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
@@ -160,12 +185,25 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
                           child: Row(
                             children: [
                               Icon(Icons.calendar_today, color: Colors.grey),
-                              SizedBox(width: 10),
-                              Text(
-                                selectedDate == null
-                                    ? "Select Date"
-                                    : "${DateFormat('').format(selectedDate!)} ($calculatedDays days)",
-                                style: TextStyle(fontSize: 16, color: Colors.black),
+                              SizedBox(width:2),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: inputController,
+                                  keyboardType: TextInputType.number,
+                                  readOnly: isDateDisplayed,
+                                  // If date is shown, disable typing
+                                  decoration: InputDecoration(
+                                    labelText: "Enter number of days",
+                                    border: InputBorder.none,
+                                    suffixIcon: isDateDisplayed
+                                        ? IconButton(
+                                            icon: Icon(Icons.clear),
+                                            onPressed: _clearInput,
+                                          )
+                                        : null,
+                                  ),
+                                  onChanged: _startConversionTimer,
+                                ),
                               ),
                             ],
                           ),
@@ -176,7 +214,6 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
                 ),
               ],
             ),
-
             const SizedBox(height: 20),
             Container(
               width: double.infinity,
@@ -203,9 +240,7 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
                 child: const Text(
                   'Next',
                   style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: white4),
+                      fontSize: 16, fontWeight: FontWeight.bold, color: white4),
                 ),
               ),
             ),
@@ -222,8 +257,7 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label,
-              style: Order2),
+          Text(label, style: Order2),
           const SizedBox(height: 5),
           _buildDropdown(items, selectedValue, onChanged),
         ],
@@ -238,8 +272,7 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label,
-              style: Order2),
+          Text(label, style: Order2),
           const SizedBox(height: 5),
           _buildTextField(hint, controller),
         ],
@@ -253,8 +286,7 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('DIMENSIONS (MM)',
-              style: Order2),
+          const Text('DIMENSIONS (MM)', style: Order2),
           const SizedBox(height: 5),
           Row(
             children: [
@@ -289,7 +321,6 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
       ),
     );
   }
-
 
   Widget _buildTextField(String hint, TextEditingController controller) {
     return TextFormField(

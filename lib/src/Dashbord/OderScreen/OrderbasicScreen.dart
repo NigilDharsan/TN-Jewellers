@@ -4,11 +4,13 @@ import 'package:TNJewellers/src/Dashbord/OderScreen/StepIndicator.dart';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_sound/flutter_sound.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-
+import 'dart:async';
+import 'package:collection/collection.dart';
+import 'package:open_file/open_file.dart';
+import 'package:record/record.dart';
 
 class Orderbasicscreen extends StatefulWidget {
   const Orderbasicscreen({super.key});
@@ -21,14 +23,9 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController firstnameController = TextEditingController();
   final TextEditingController invoiceController = TextEditingController();
-  FlutterSoundRecorder? _recorder;
-  FlutterSoundPlayer? _player;
-  bool _isRecording = false;
-  String? _audioPath;
   String? selectedAudioFile;
   String? selectedPhoto;
   String? selectedVideo;
-  bool _isPlaying = false;
   int currentStep = 1;
 
   // Pick File Function
@@ -55,53 +52,120 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
       });
     }
   }
+
+
+  final AudioRecorder _recorder = AudioRecorder();
+  bool _isRecording = false;
+  bool _isPaused = false;
+  String? _currentFilePath;
+  List<String> _recordedFiles = [];
+  int _elapsedTime = 0;
+  Timer? _timer;
+  final TextEditingController _filenameController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
-    _recorder = FlutterSoundRecorder();
-    _initRecorder();
+    _requestPermissions();
+    _loadRecordedFiles();
   }
-  Future<void> _initRecorder() async {
-    await _recorder!.openRecorder();
+
+  Future<void> _requestPermissions() async {
     await Permission.microphone.request();
+    await Permission.storage.request();
   }
-
   Future<void> _startRecording() async {
-    Directory tempDir = await getTemporaryDirectory();
-    _audioPath = '${tempDir.path}/audio_record.wav';
+    if (_isRecording) return;
+    Directory dir = await getApplicationDocumentsDirectory();
+    String filename = _filenameController.text.trim().isEmpty
+        ? "Audio_${DateTime.now().millisecondsSinceEpoch}"
+        : _filenameController.text.trim();
+    _currentFilePath = '${dir.path}/$filename.mp4';
+    if (await _recorder.hasPermission()) {
+      await _recorder.start(const RecordConfig(), path: _currentFilePath!);
+      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+        setState(() {
+          _elapsedTime++;
+        });
+      });
 
-    await _recorder!.startRecorder(toFile: _audioPath!);
-    setState(() => _isRecording = true);
-  }
-
-  Future<void> _stopRecording() async {
-    await _recorder!.stopRecorder();
-    setState(() => _isRecording = false);
-  }
-
-  Future<void> _playAudio() async {
-    if (_audioPath != null && !_isPlaying) {
-      await _player!.startPlayer(
-        fromURI: _audioPath!,
-        whenFinished: () {
-          setState(() => _isPlaying = false);
-        },
-      );
-      setState(() => _isPlaying = true);
+      setState(() {
+        _isRecording = true;
+        _isPaused = false;
+      });
     }
   }
+  Future<void> _pauseRecording() async {
+    if (!_isRecording || _isPaused) return;
 
-  void _deleteAudio() {
+    await _recorder.pause();
+    _timer?.cancel();
     setState(() {
-      _audioPath = null;
+      _isPaused = true;
     });
   }
-  @override
-  void dispose() {
-    _recorder!.closeRecorder();
-    super.dispose();
+  Future<void> _resumeRecording() async {
+    if (!_isRecording || !_isPaused) return;
+    await _recorder.resume();
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        _elapsedTime++;
+      });
+    });
+    setState(() {
+      _isPaused = false;
+    });
   }
-  // Go to Next Screen
+  Future<void> _stopRecording() async {
+    if (!_isRecording) return;
+
+    await _recorder.stop();
+    _timer?.cancel();
+
+    setState(() {
+      _isRecording = false;
+      _isPaused = false;
+      _elapsedTime = 0;
+      if (_currentFilePath != null) {
+        _recordedFiles.add(_currentFilePath!);
+      }
+    });
+
+    _loadRecordedFiles();
+  }
+  Future<void> _deleteRecording(int index) async {
+    File file = File(_recordedFiles[index]);
+    if (await file.exists()) {
+      await file.delete();
+    }
+
+    setState(() {
+      _recordedFiles.removeAt(index);
+    });
+
+    _loadRecordedFiles();
+  }
+  Future<void> _loadRecordedFiles() async {
+    Directory dir = await getApplicationDocumentsDirectory();
+    List<FileSystemEntity> files = dir.listSync();
+
+    setState(() {
+      _recordedFiles = files
+          .where((file) => file.path.endsWith(".mp4")) // Filter only MP4 files
+          .map((file) => file.path)
+          .toList();
+
+      _recordedFiles.sort((a, b) =>
+          compareNatural(a.split('/').last, b.split('/').last)
+      );
+    });
+  }
+  Future<void> _openFile(String filePath) async {
+    await OpenFile.open(filePath);
+  }
+
+
+
   void nextStep() {
     if (_formKey.currentState!.validate()) {
       Get.to(() => OrderScreenTwo());
@@ -154,9 +218,10 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
               ),
               SizedBox(height: 20),
               Align(
-                  alignment: Alignment.centerLeft,
+                alignment: Alignment.centerLeft,
                 child: buildAudioAttachment(),
               ),
+              _buildDescriptionContainer(),
               SizedBox(height: 20),
               Container(
                 width: double.infinity,
@@ -273,96 +338,147 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
             ),
           ),
         ),
-        if (fileName != null) ...[
-          SizedBox(height: 5),
-          Container(
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: white6,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 5,
-                  offset: Offset(0, 1),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(child: Text(fileName, overflow: TextOverflow.ellipsis)),
-              ],
-            ),
-          ),
-        ],
       ],
     );
   }
+
+  Widget _buildDescriptionContainer() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Description',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        SizedBox(height: 5),
+        Container(
+          padding: EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.grey),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: _buildContentValue(
+                  'Description',
+                  'some text',
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child:
+                _buildContentValue('Expected Delivery Date', '18/03/2025'),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContentValue(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 5),
+        Text(
+          value,
+          style: TextStyle(fontSize: 12),
+        ),
+      ],
+    );
+  }
+
+
 
   Widget buildAudioAttachment() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Record or Attach Audio", style: TextStyle(fontWeight: FontWeight.bold)),
-        SizedBox(height: 5),
-        GestureDetector(
-          onTap: _isRecording ? _stopRecording : _startRecording,
-          child: Container(
-            width: 200,
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white70,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 5,
-                  offset: Offset(0, 1),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            color: Colors.grey[350],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    _isRecording
+                        ? (_isPaused ? "Paused" : "Recording... $_elapsedTime sec")
+                        : "Attach Audio",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              _isRecording
+                  ? Row(
+                children: [
+                  IconButton(
+                    icon: Icon(_isPaused ? Icons.play_arrow : Icons.pause, color: Colors.black, size: 25),
+                    onPressed: _isPaused ? _resumeRecording : _pauseRecording,
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.stop, color: Colors.black, size: 25),
+                    onPressed: _stopRecording,
+                  ),
+                ],
+              )
+                  : GestureDetector(
+                onTap: _startRecording,
+                child: CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.mic, color: Colors.black, size: 25),
                 ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(_isRecording ? Icons.stop : Icons.mic, color: Colors.black),
-                SizedBox(width: 10),
-                Text(_isRecording ? "Stop Recording" : "Start Recording", style: TextStyle(color: Colors.black, fontSize: 14)),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-        if (_audioPath != null) ...[
-          SizedBox(height: 10),
-          Container(
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 5,
-                  offset: Offset(0, 1),
+        SizedBox(
+          height: 200, // Set a fixed height to avoid Expanded inside Column issue
+          child: ListView.builder(
+            itemCount: _recordedFiles.length,
+            itemBuilder: (context, index) {
+              return Card(
+                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                elevation: 3,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                child: ListTile(
+                  leading: Icon(Icons.volume_up_rounded, color: Colors.deepPurple),
+                  title: Text(_recordedFiles[index].split('/').last), // Show file name
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.play_arrow, color: Colors.green),
+                        onPressed: () => _openFile(_recordedFiles[index]),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => _deleteRecording(index),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(child: Text("Recorded Audio: ${_audioPath!.split('/').last}", overflow: TextOverflow.ellipsis)),
-                IconButton(
-                  icon: Icon(Icons.play_arrow, color: Colors.green),
-                  onPressed: _playAudio,
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete, color: Colors.red),
-                  onPressed: _deleteAudio,
-                ),
-              ],
-            ),
+              );
+            },
           ),
-        ],
+        ),
       ],
     );
   }

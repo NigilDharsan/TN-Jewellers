@@ -57,11 +57,11 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
             Row(
               children: [
                 Expanded(
-                  child: _buildTextWithValue('Customer Name', 'NIKIL'),
+                  child: _buildTextWithValue('Work Order Type', 'NEW SIZE'),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: _buildTextWithValue('Invoice Number', 'THOJR-123'),
+                  child: _buildTextWithValue('Art No/Browse Catalog', 'BNG7685-23'),
                 ),
               ],
             ),

@@ -8,7 +8,7 @@ const appPadding = 16.0;
 
 const JosefinSansLight = TextStyle(
     fontFamily: 'JosefinSans',
-    fontWeight: FontWeight.w300,
+    fontWeight: FontWeight.w500,
     color: brandGoldLightColor,
     fontSize: 10);
 
@@ -95,16 +95,16 @@ const headerTitle = TextStyle(
 //List Number
 TextStyle spanList = TextStyle(
   fontFamily: 'JosefinSans',
-  fontSize: 8,
+  fontSize: 10,
   color: Color.fromRGBO(255, 255, 255, 1),
   fontWeight: FontWeight.w400,
 );
 
 TextStyle categoryTitle = TextStyle(
   fontFamily: 'JosefinSans',
-  fontSize: 8,
+  fontSize: 14,
   color: brandGreyColor,
-  fontWeight: FontWeight.w700,
+  fontWeight: FontWeight.bold,
 );
 
 TextStyle splTextTitle = TextStyle(

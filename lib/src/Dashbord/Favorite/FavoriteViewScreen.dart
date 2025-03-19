@@ -378,7 +378,7 @@ class _FavoriteViewScreenState extends State<FavoriteViewScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 30),
+                SizedBox(height: 20),
                 GestureDetector(
                   onTap: () {
                     setState(() {

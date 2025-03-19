@@ -46,7 +46,12 @@ dependencies:
   get_storage:
   http: 
   image_picker: 
-  intl: 
+  intl:
+
+
+  record:
+  open_file:
+  collection:
 
   path:
   path_provider: 

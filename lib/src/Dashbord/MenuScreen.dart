@@ -3,7 +3,6 @@ import 'package:TNJewellers/src/Product/ProductScreen.dart';
 import 'package:TNJewellers/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../../utils/colors.dart';
 import '../../utils/images.dart';
 
@@ -185,11 +184,10 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
                 SizedBox(height: 20),
                 SizedBox(
-                  height: (6 / 2) * 155,
-                  // Adjusts height to 40% of screen height
+                  height: (4 / 2) * 150,
                   child: GridView.builder(
                     physics: NeverScrollableScrollPhysics(),
-                    itemCount: 6,
+                    itemCount: 4,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       childAspectRatio:
@@ -200,14 +198,13 @@ class _MenuScreenState extends State<MenuScreen> {
                     itemBuilder: (BuildContext context, int index) {
                       return index == 0
                           ? Container(
-                              margin: EdgeInsets.all(1),
-                              padding: EdgeInsets.all(10),
+                              margin: EdgeInsets.all(0),
+                              padding: EdgeInsets.all(5),
                               decoration: BoxDecoration(
                                 color: brandPrimaryColor,
                               ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
-                                // Prevents extra space issues
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
@@ -282,7 +279,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     },
                   ),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 10),
                 Text('BROWSER BY JEWEL TYPE',
                     style:
                         TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
@@ -357,7 +354,7 @@ Widget GridViewCartDesign(Color backgroundColor, String title,
     IconData titleIcon, String subTitle, String subTitle1, String subTitle2) {
   return Container(
     margin: EdgeInsets.all(0),
-    padding: EdgeInsets.all(10),
+    padding: EdgeInsets.all(5),
     decoration: BoxDecoration(
       color: backgroundColor,
     ),
