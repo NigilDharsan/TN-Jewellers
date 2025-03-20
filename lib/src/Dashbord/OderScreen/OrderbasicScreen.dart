@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:TNJewellers/src/Dashbord/OderScreen/OrderScreen2.dart';
+import 'package:TNJewellers/src/Dashbord/OderScreen/OrderScreen3.dart';
 import 'package:TNJewellers/src/Dashbord/OderScreen/StepIndicator.dart';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:file_picker/file_picker.dart';
@@ -9,11 +11,15 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
 import 'package:collection/collection.dart';
-import 'package:open_file/open_file.dart';
 import 'package:record/record.dart';
+import 'package:flutter_sound/flutter_sound.dart';
+import 'package:video_player/video_player.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Orderbasicscreen extends StatefulWidget {
-  const Orderbasicscreen({super.key});
+  final String videoPath;
+  const Orderbasicscreen({super.key,required this.videoPath});
 
   @override
   State<Orderbasicscreen> createState() => _OrderbasicscreenState();
@@ -27,60 +33,63 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
   String? selectedPhoto;
   String? selectedVideo;
   int currentStep = 1;
-
-  // Pick File Function
-  void pickFile(String type) async {
-    FileType fileType;
-    if (type == 'audio') {
-      fileType = FileType.audio;
-    } else if (type == 'video') {
-      fileType = FileType.video;
-    } else {
-      fileType = FileType.image;
-    }
-
-    FilePickerResult? result = await FilePicker.platform.pickFiles(type: fileType);
-    if (result != null) {
-      setState(() {
-        if (type == 'audio') {
-          selectedAudioFile = result.files.single.path;
-        } else if (type == 'video') {
-          selectedVideo = result.files.single.path;
-        } else {
-          selectedPhoto = result.files.single.path;
-        }
-      });
-    }
-  }
-
-
   final AudioRecorder _recorder = AudioRecorder();
+  final FlutterSoundPlayer _player = FlutterSoundPlayer();
   bool _isRecording = false;
-  bool _isPaused = false;
+  bool _isPlaying = false;
   String? _currentFilePath;
   List<String> _recordedFiles = [];
   int _elapsedTime = 0;
   Timer? _timer;
-  final TextEditingController _filenameController = TextEditingController();
+  double _playbackProgress = 0.0;
+  Duration? _selectedDuration;
+  List<Map<String, dynamic>> selectedFiles = [];
+  final ImagePicker _imagePicker = ImagePicker();
+  final OrderController controller = Get.put(OrderController());
+
 
   @override
   void initState() {
     super.initState();
     _requestPermissions();
     _loadRecordedFiles();
+    loadSavedFiles();
+    _player.openPlayer();
   }
+
+
 
   Future<void> _requestPermissions() async {
     await Permission.microphone.request();
     await Permission.storage.request();
   }
+  Future<void> _loadRecordedFiles() async {
+    Directory dir = await getApplicationDocumentsDirectory();
+    List<FileSystemEntity> files = dir.listSync();
+    setState(() {
+      _recordedFiles = files
+          .where((file) => file.path.endsWith(".mp4"))
+          .map((file) => file.path)
+          .toList();
+      _recordedFiles
+          .sort((a, b) => compareNatural(a.split('/').last, b.split('/').last));
+    });
+  }
+  Future<void> _deleteRecording(int index) async {
+    File file = File(_recordedFiles[index]);
+    if (await file.exists()) {
+      await file.delete();
+    }
+    setState(() {
+      _recordedFiles.removeAt(index);
+    });
+    _loadRecordedFiles();
+  }
   Future<void> _startRecording() async {
     if (_isRecording) return;
     Directory dir = await getApplicationDocumentsDirectory();
-    String filename = _filenameController.text.trim().isEmpty
-        ? "Audio_${DateTime.now().millisecondsSinceEpoch}"
-        : _filenameController.text.trim();
-    _currentFilePath = '${dir.path}/$filename.mp4';
+    String filename = "Audio_${DateTime.now().millisecondsSinceEpoch}.mp4";
+    _currentFilePath = '${dir.path}/$filename';
     if (await _recorder.hasPermission()) {
       await _recorder.start(const RecordConfig(), path: _currentFilePath!);
       _timer = Timer.periodic(Duration(seconds: 1), (timer) {
@@ -88,133 +97,204 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
           _elapsedTime++;
         });
       });
-
       setState(() {
         _isRecording = true;
-        _isPaused = false;
       });
     }
   }
-  Future<void> _pauseRecording() async {
-    if (!_isRecording || _isPaused) return;
-
-    await _recorder.pause();
-    _timer?.cancel();
-    setState(() {
-      _isPaused = true;
-    });
-  }
-  Future<void> _resumeRecording() async {
-    if (!_isRecording || !_isPaused) return;
-    await _recorder.resume();
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        _elapsedTime++;
-      });
-    });
-    setState(() {
-      _isPaused = false;
-    });
-  }
   Future<void> _stopRecording() async {
     if (!_isRecording) return;
-
     await _recorder.stop();
     _timer?.cancel();
-
     setState(() {
       _isRecording = false;
-      _isPaused = false;
       _elapsedTime = 0;
       if (_currentFilePath != null) {
         _recordedFiles.add(_currentFilePath!);
       }
     });
-
     _loadRecordedFiles();
   }
-  Future<void> _deleteRecording(int index) async {
-    File file = File(_recordedFiles[index]);
-    if (await file.exists()) {
-      await file.delete();
+  Future<void> _playSegment(String filePath, int seconds) async {
+    if (_isPlaying) {
+      await _player.stopPlayer();
+      setState(() {
+        _isPlaying = false;
+        _playbackProgress = 0.0;
+        _currentFilePath = null;
+      });
     }
 
-    setState(() {
-      _recordedFiles.removeAt(index);
+    _currentFilePath = filePath; // Set currently playing file
+    _selectedDuration = Duration(seconds: seconds);
+
+    await _player.startPlayer(
+      fromURI: filePath,
+      codec: Codec.aacMP4,
+      whenFinished: () {
+        setState(() {
+          _isPlaying = false;
+          _playbackProgress = 0.0;
+          _currentFilePath = null;
+        });
+      },
+    );
+
+    setState(() => _isPlaying = true);
+
+    double interval = 0.1; // Update every 100ms
+    int totalUpdates = (seconds / interval).ceil();
+    int currentUpdate = 0;
+
+    Timer.periodic(Duration(milliseconds: (interval * 1000).toInt()), (timer) {
+      if (!_isPlaying || currentUpdate >= totalUpdates) {
+        timer.cancel();
+        _player.stopPlayer();
+        setState(() {
+          _isPlaying = false;
+          _playbackProgress = 0.0;
+          _currentFilePath = null;
+        });
+      } else {
+        setState(() {
+          _playbackProgress = currentUpdate / totalUpdates;
+        });
+        currentUpdate++;
+      }
     });
-
-    _loadRecordedFiles();
   }
-  Future<void> _loadRecordedFiles() async {
-    Directory dir = await getApplicationDocumentsDirectory();
-    List<FileSystemEntity> files = dir.listSync();
 
-    setState(() {
-      _recordedFiles = files
-          .where((file) => file.path.endsWith(".mp4")) // Filter only MP4 files
-          .map((file) => file.path)
-          .toList();
 
-      _recordedFiles.sort((a, b) =>
-          compareNatural(a.split('/').last, b.split('/').last)
+
+  Future<void> loadSavedFiles() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedFiles = prefs.getString('selectedFiles');
+    if (savedFiles != null) {
+      List<Map<String, dynamic>> storedFiles =
+      List<Map<String, dynamic>>.from(json.decode(savedFiles));
+      List<Map<String, dynamic>> validFiles = [];
+
+      for (var file in storedFiles) {
+        if (await File(file['path']).exists()) { // Use async exists check
+          validFiles.add(file);
+        }
+      }
+
+      setState(() {
+        selectedFiles = validFiles;
+      });
+
+      saveFiles(); // Save only valid files again
+    }
+  }
+  Future<void> saveFiles() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('selectedFiles', json.encode(selectedFiles));
+  }
+  Future<void> _openCamera() async {
+    final XFile? pickedFile = await _imagePicker.pickImage(
+      source: ImageSource.camera,
+    );
+    if (pickedFile != null) {
+      setState(() {
+        selectedFiles.add({'path': pickedFile.path, 'type': 'image'});
+      });
+      saveFiles();
+    }
+  }
+  Future<void> pickFile(String type) async {
+    String? filePath;
+    if (type == 'image') {
+      final XFile? pickedFile =
+      await _imagePicker.pickImage(source: ImageSource.gallery);
+      filePath = pickedFile?.path;
+    } else if (type == 'video') {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.video,
       );
+      if (result != null && result.files.single.path != null) {
+        filePath = result.files.single.path!;
+      }
+    }
+
+    if (filePath != null && File(filePath).existsSync()) {
+      setState(() {
+        selectedFiles.add({'path': filePath, 'type': type});
+      });
+      saveFiles();
+    }
+  }
+  void removeFile(int index) {
+    setState(() {
+      selectedFiles.removeAt(index);
     });
+    saveFiles();
   }
-  Future<void> _openFile(String filePath) async {
-    await OpenFile.open(filePath);
-  }
+
+
+
 
 
 
   void nextStep() {
     if (_formKey.currentState!.validate()) {
-      Get.to(() => OrderScreenTwo());
+      if (controller.screenType.value == "oredertwo") {
+        Get.to(() => OrderScreenTwo());
+      } else if (controller.screenType.value == "orderthree") {
+        Get.to(() => OrderScreenThree());
+      }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Create Order')),
+      appBar: AppBar(title: Text('Create New Order')),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              Text(
-                'Create New Order',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
               SizedBox(height: 10),
               StepIndicator(currentStep: currentStep),
               SizedBox(height: 20),
-              _buildTextField('Enter your nickname', 'NICK NAME', firstnameController,false),
+              _buildTextField('Enter your nickname', 'NICK NAME',
+                  firstnameController, false),
               SizedBox(height: 10),
-              _buildTextField('Enter Invoice/Ref No', 'INVOICE/REF NO', invoiceController,false),
+              _buildTextField('Enter Invoice/Ref No', 'INVOICE/REF NO',
+                  invoiceController, false),
               SizedBox(height: 20),
               Row(
                 children: [
                   Expanded(
                     child: buildAttachmentSection(
-                      text: "Upload Photo",
-                      label: "Photo",
+                      label: "Take Camera\nPhoto",
                       icon: Icons.camera_alt,
-                      onPick: () => pickFile('image'),
-                      fileName: selectedPhoto,
+                      onPick: _openCamera,
                     ),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: buildAttachmentSection(
-                      text: "Upload Video",
-                      label: "Video",
-                      icon: Icons.video_library,
-                      onPick: () => pickFile('video'),
-                      fileName: selectedVideo,
+                      label: "Upload Media\nPhoto",
+                      icon: Icons.image,
+                      onPick: _showMediaSelectionDialog,
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                height: 120,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: selectedFiles.length,
+                  itemBuilder: (context, index) {
+                    return buildMediaContainer(selectedFiles[index], index);
+                  },
+                ),
               ),
               SizedBox(height: 20),
               Align(
@@ -260,8 +340,6 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
       ),
     );
   }
-
-  // Text Input Field
   Widget _buildTextField(String hintName, String label,
       TextEditingController controller, bool isPassword) {
     return Column(
@@ -298,47 +376,109 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
                 ),
-
               ),
-            ),
-          ),),
-      ],
-    );
-  }
-
-
-  // Attachment Section
-  Widget buildAttachmentSection({
-    required String label,
-    required String text,
-    required IconData icon,
-    required VoidCallback onPick,
-    String? fileName,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GestureDetector(
-          onTap: onPick,
-          child: Container(
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white70,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 5,
-                  offset: Offset(0, 1),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [Icon(icon), SizedBox(width: 10), Text(label)],
             ),
           ),
         ),
       ],
+    );
+  }
+
+  Widget buildAttachmentSection({
+    required String label,
+    required IconData icon,
+    required VoidCallback onPick,
+  }) {
+    return GestureDetector(
+      onTap: onPick,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white70,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 5,
+              offset: Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [Icon(icon), const SizedBox(width: 10), Text(label)],
+        ),
+      ),
+    );
+  }
+
+  Widget buildMediaContainer(Map<String, dynamic> file, int index) {
+    File mediaFile = File(file['path']);
+    return mediaFile.existsSync()
+        ? Stack(
+      children: [
+        Container(
+          width: 120,
+          height: 100,
+          margin: const EdgeInsets.symmetric(horizontal: 5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.grey),
+          ),
+          child: file['type'] == 'image'
+              ? ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.file(
+              mediaFile,
+              fit: BoxFit.cover,
+            ),
+          )
+              : Orderbasicscreen(videoPath: file['path']),
+        ),
+        Positioned(
+          top: 5,
+          right: 5,
+          child: GestureDetector(
+            onTap: () => removeFile(index),
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+              ),
+              padding: const EdgeInsets.all(4),
+              child: const Icon(Icons.close, size: 18, color: Colors.white),
+            ),
+          ),
+        ),
+      ],
+    )
+        : const Center(child: Text("File not found!"));
+  }
+
+  void _showMediaSelectionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Select Media Type"),
+          content: const Text("Do you want to upload an image or a video?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close dialog
+                pickFile('image'); // Pick Image
+              },
+              child: const Text("Image"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close dialog
+                pickFile('video'); // Pick Video
+              },
+              child: const Text("Video"),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -374,7 +514,7 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
               const SizedBox(width: 10),
               Expanded(
                 child:
-                _buildContentValue('Expected Delivery Date', '18/03/2025'),
+                    _buildContentValue('Expected Delivery Date', '18/03/2025'),
               ),
             ],
           ),
@@ -400,81 +540,87 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
     );
   }
 
-
-
   Widget buildAudioAttachment() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            color: Colors.grey[350],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    _isRecording
-                        ? (_isPaused ? "Paused" : "Recording... $_elapsedTime sec")
-                        : "Attach Audio",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              _isRecording
-                  ? Row(
-                children: [
-                  IconButton(
-                    icon: Icon(_isPaused ? Icons.play_arrow : Icons.pause, color: Colors.black, size: 25),
-                    onPressed: _isPaused ? _resumeRecording : _pauseRecording,
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.stop, color: Colors.black, size: 25),
-                    onPressed: _stopRecording,
-                  ),
-                ],
-              )
-                  : GestureDetector(
-                onTap: _startRecording,
-                child: CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.mic, color: Colors.black, size: 25),
+        GestureDetector(
+          onTap: () {
+            if (_isRecording) {
+              _stopRecording();
+            } else {
+              _startRecording();
+            }
+          },
+          child: Container(
+            width: 220,
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: _isRecording ? Colors.grey[200] : Colors.grey[200], // Change color when recording
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      _isRecording ? Icons.stop : Icons.mic,
+                      color: Colors.black,
+                    ),
+                    SizedBox(width: 5),
+                    Text(
+                      _isRecording
+                          ? "$_elapsedTime sec" // Show elapsed time when recording
+                          : "ATTACH AUDIO: $_elapsedTime sec",
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         SizedBox(
-          height: 200, // Set a fixed height to avoid Expanded inside Column issue
+          height: 100,
           child: ListView.builder(
             itemCount: _recordedFiles.length,
             itemBuilder: (context, index) {
-              return Card(
-                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                elevation: 3,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                child: ListTile(
-                  leading: Icon(Icons.volume_up_rounded, color: Colors.deepPurple),
-                  title: Text(_recordedFiles[index].split('/').last), // Show file name
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.play_arrow, color: Colors.green),
-                        onPressed: () => _openFile(_recordedFiles[index]),
+              String filePath = _recordedFiles[index];
+              return Column(
+                children: [
+                  ListTile(
+                    leading: IconButton(
+                      icon: Icon(
+                        _isPlaying && _currentFilePath == filePath
+                            ? Icons.stop
+                            : Icons.play_arrow,
+                        color: Colors.deepPurple,
                       ),
-                      IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _deleteRecording(index),
-                      ),
-                    ],
+                      onPressed: () {
+                        if (_isPlaying && _currentFilePath == filePath) {
+                          _stopRecording();
+                        } else {
+                          _playSegment(filePath, 5); // Plays for 5 seconds
+                        }
+                      },
+                    ),
+                    title: Text(filePath.split('/').last),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => _deleteRecording(index),
+                    ),
                   ),
-                ),
+                  LinearProgressIndicator(
+                    value: (_isPlaying && _currentFilePath == filePath)
+                        ? _playbackProgress
+                        : 0.0,
+                  ),
+                ],
               );
             },
           ),

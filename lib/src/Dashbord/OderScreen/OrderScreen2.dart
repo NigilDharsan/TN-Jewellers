@@ -81,7 +81,7 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Create Order')),
+      appBar: AppBar(title: const Text('Create New Order')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
