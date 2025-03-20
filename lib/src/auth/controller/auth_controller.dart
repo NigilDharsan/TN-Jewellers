@@ -1,19 +1,16 @@
 import 'dart:async';
 
+import 'package:TNJewellers/src/Dashbord/TabScreen.dart';
+import 'package:TNJewellers/src/auth/repository/auth_repo.dart';
+import 'package:TNJewellers/utils/Loader/loader_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:TNJewellers/src/auth/repository/auth_repo.dart';
-import 'package:TNJewellers/utils/widgets/custom_snackbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthController extends GetxController implements GetxService {
   final AuthRepo authRepo;
 
   AuthController({required this.authRepo});
-
-  String? _verificationId;
-  bool _isOtpSent = false;
-  int? _resendToken; // Used for resending OTP
 
   bool _isLoading = false;
   bool? _acceptTerms = false;
@@ -30,6 +27,9 @@ class AuthController extends GetxController implements GetxService {
     isEditLocation.value = isEdit;
   }
 
+  final formKey = GlobalKey<FormState>();
+  bool obscurePassword = true;
+
   ///TextEditingController for signUp screen
   var firstNameController = TextEditingController();
   var lastNameController = TextEditingController();
@@ -42,17 +42,6 @@ class AuthController extends GetxController implements GetxService {
   var countryDialCodeController = TextEditingController();
   var countryNameController = TextEditingController();
   var operationArea = TextEditingController();
-
-  var establishNameController = TextEditingController();
-  var establishCountryController = TextEditingController();
-  var restaurantIdController = TextEditingController();
-  var gstinNumberController = TextEditingController();
-  var establishTypeController = TextEditingController();
-  var establishDialCodeController = TextEditingController();
-  var establishContactController = TextEditingController();
-  var establishEmailController = TextEditingController();
-
-  var supplierDocTypeController = TextEditingController();
 
   bool isEstablishment = false;
 
@@ -221,55 +210,54 @@ class AuthController extends GetxController implements GetxService {
   Future<void> login() async {
     _hideKeyboard();
     _isLoading = true;
+    loaderController.showLoaderAfterBuild(_isLoading);
+
     update();
 
-    if (await validateUser(signInEmailController.text.trim())) {
-      Response? response = await authRepo.login(
-          email: _emailAddress, password: signInPasswordController.value.text);
-      if (response != null && response.statusCode == 200) {
-        print("LOGIN RESPONSE ${response.body}");
-        String accessToken = response.body['access_token'];
-        String refreshToken = response.body['refresh_token'];
+    Response? response = await authRepo.login(
+        email: emailController.value.text,
+        password: passwordController.value.text);
+    if (response != null && response.statusCode == 200) {
+      print("LOGIN RESPONSE ${response.body}");
+      String accessToken = response.body['token'];
 
-        print('refreshToken: $refreshToken');
-
-        emailController.clear();
-        passwordController.clear();
-      }
-
-      _isLoading = false;
-      update();
-    } else {
-      print('Invalid User');
-    }
-  }
-
-  //forgot password
-  Future<void> forgetPasswordOTP({required String isVerifyEmail}) async {
-    if (emailController.value.text.isEmpty) return;
-    _hideKeyboard();
-    _isLoading = true;
-    update();
-
-    if (await validateUser(emailController.text.trim())) {
-      Response? response = await authRepo.forgetPasswordOTP(_emailAddress,
-          isVerifyEmail: isVerifyEmail);
-      if (response?.statusCode == 201) {
-        final arguments = {
-          'email': emailController.value.text,
-        };
-
-        _verificationCode = '';
-        _otp = '';
-        customSnackBar(response?.body['message'], isError: false);
-        // Get.toNamed(RouteHelper.forgotPasswordOTPVerificationScreen,
-        //     arguments: arguments);
-      }
+      emailController.clear();
+      passwordController.clear();
+      Get.offAll(TabsScreen()); // Perform login action
     }
 
     _isLoading = false;
+    loaderController.showLoaderAfterBuild(_isLoading);
+
     update();
   }
+
+  // //forgot password
+  // Future<void> forgetPasswordOTP({required String isVerifyEmail}) async {
+  //   if (emailController.value.text.isEmpty) return;
+  //   _hideKeyboard();
+  //   _isLoading = true;
+  //   update();
+
+  //   if (await validateUser(emailController.text.trim())) {
+  //     Response? response = await authRepo.forgetPasswordOTP(_emailAddress,
+  //         isVerifyEmail: isVerifyEmail);
+  //     if (response?.statusCode == 201) {
+  //       final arguments = {
+  //         'email': emailController.value.text,
+  //       };
+
+  //       _verificationCode = '';
+  //       _otp = '';
+  //       customSnackBar(response?.body['message'], isError: false);
+  //       // Get.toNamed(RouteHelper.forgotPasswordOTPVerificationScreen,
+  //       //     arguments: arguments);
+  //     }
+  //   }
+
+  //   _isLoading = false;
+  //   update();
+  // }
 
   String _verificationCode = '';
   String _otp = '';

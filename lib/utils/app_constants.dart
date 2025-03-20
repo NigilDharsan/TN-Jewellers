@@ -5,87 +5,8 @@ class AppConstants {
   static const String onBoards = 'on-boards';
   static const String socialLoginUrl = 'social-login';
 
-  static const String mobileDeviceUrl = 'api/mobile-devices';
-  static const String signupVerificationUrl =
-      'api/uam/users/sign-up-verification';
-  static const String registerUrl = 'api/uam/registration';
-  static const String createAddressUrl =
-      'api/uam/account-addresses/create-address';
-  static const String updateAddressUrl = 'api/uam/registration';
-
-  static const String bankAccountVerifyUrl = 'api/razorpay/fund-accounts';
-
-  static const String addBankAccountUrl = 'api/bank-account-details';
-  static const String defaultAddressUrl =
-      "api/uam/account-addresses/default-address";
-
-  static const String addressList = "api/uam/account-addresses/";
-  static const String accountDetailUrl = "api/bank-account-details/";
-  //
-  static const String registerWithPhone = 'register-by-phone';
-  static const String verifyPhoneOTP = 'verify-phone-otp';
-  static const String resendPhoneOTP = 'resend-phone-otp';
-  static const String getPhoneLoginOTP = 'get-login-otp';
-  static const String verifyLoginPhoneOTP = 'verify-login-otp';
-  static const String verifyEmailOTP = 'email-verify';
-  static const String resendEmailOTP = 'resend-email-otp';
-  static const String forgotPasswordOTP = 'api/uam/otp/generate';
-
-  // static const String verifyOTPForForgotPassword = 'verify-otp';
-  static const String resetPassword = 'api/uam/users/reset-password';
-  static const String changePassword = 'api/uam/users/change-password';
-  static const String getAntiForgeryToken = 'api/uam/antiforgery-token';
-
-  //home
-  static const String homeScreen = 'home-screen';
-
-  //profile
-  static const String profile = 'api/uam/me';
-  static const String updateProfile = 'user/update-profile';
-  static const String deleteAccount = 'user/delete-account';
-
-  static const String avatarUpdate = 'api/uam/users/profile/avatar';
-  static const String getAvatarUrl = 'api/uam/users/';
-  static const String validateUrl = 'api/uam/users/validate/MOBILE/';
-  static const String kycDocuments = 'api/documents';
-
-  //search
-  static const String searchCourses = "search-courses";
-
-  //Chat
-
-  static const String chatCountApi = 'api/messages/GetUnReadMessageCount';
-  static const String chatHubApi = 'api/chat/chathub';
-
-  //notification
-  static const String notificationApi = 'user/notifications';
-  static const String getNotificationSettingApi =
-      'api/uam/user-notifications-configs/search?';
-  static const String updateNotificationSettingApi =
-      "api/uam/user-notifications-configs/";
-  static const String getNotificationUrl = 'api/saas/push-notifications';
-
-  //report
-  static const String getSupplierReportUrl = 'api/get-supplier-graph-data';
-  static const String getDriverReportUrl = 'api/get-driver-graph-data';
-
-// UCO
-  static const String ucoSchedulePost = 'api/uco-schedules';
-  static const String ucoGetData = 'mobile/uco-mdm';
-  static const String ucoTypeUrl = 'mobile/uco-type';
-  static const String documentTypes = 'mobile/supplier-documents';
-  static const String ucoEstablishmentData = 'mobile/registration';
-  static const String uploadDocuments = 'api/documents/upload-documents';
-  static const String driverDocumentTypes = 'mobile/driver-documents';
-  static const String raiseComplaint = 'api/complaints';
-  static const String getUploadFiles = 'api/documents/search?';
-  static const String chatConversations = 'api/conversations';
-  static const String groupChatConversations = 'api/conversations/participants';
-
-  static const String getDocumentation = "api/uco-configurations/UCOSUPDOC/";
-  static const String uploadDocumentation = "api/supplier-document-upload";
-  static const String ucoDateConfigUrl = "api/uco-configurations/SUPPICKDAYS/";
-  static const String ucoConfigurationUrl = "api/uco-configurations/";
+  static const String customerLogin = 'customersettings/customer_login/';
+  static const String customerSignup = 'customersettings/customer_signup/';
 
   static const String isSupplier = 'is_supplier';
   static const String notificationChannel = 'channel_type';

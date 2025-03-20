@@ -1,4 +1,4 @@
-import 'package:TNJewellers/src/Dashbord/TabScreen.dart';
+import 'package:TNJewellers/src/auth/controller/auth_controller.dart';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:TNJewellers/utils/core/helper/route_helper.dart';
 import 'package:TNJewellers/utils/images.dart';
@@ -13,11 +13,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  bool _obscurePassword = true;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,42 +20,52 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Center(
-          child: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(Images.logoPng, height: 100),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'SIGN IN',
-                    style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: brandGreyColor),
-                  ),
-                  const SizedBox(height: 30),
-                  _buildTextField('Enter your text here',
-                      'LOGIN/USER NAME/EMAIL', _emailController, false),
-                  const SizedBox(height: 20),
-                  _buildTextField('Enter your text here', 'PASSWORD',
-                      _passwordController, true),
-                  const SizedBox(height: 30),
-                  _buildSignInButton(),
-                  const SizedBox(height: 30),
-                  _buildRegisterButton(),
-                ],
+          child: GetBuilder<AuthController>(builder: (controller) {
+            return SingleChildScrollView(
+              child: Form(
+                key: controller.formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(Images.logoPng, height: 100),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'SIGN IN',
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: brandGreyColor),
+                    ),
+                    const SizedBox(height: 30),
+                    _buildTextField(
+                        'Enter your text here',
+                        'LOGIN/USER NAME/EMAIL',
+                        controller.emailController,
+                        false,
+                        controller),
+                    const SizedBox(height: 20),
+                    _buildTextField('Enter your text here', 'PASSWORD',
+                        controller.passwordController, true, controller),
+                    const SizedBox(height: 30),
+                    _buildSignInButton(controller),
+                    const SizedBox(height: 30),
+                    _buildRegisterButton(),
+                  ],
+                ),
               ),
-            ),
-          ),
+            );
+          }),
         ),
       ),
     );
   }
 
-  Widget _buildTextField(String hintName, String label,
-      TextEditingController controller, bool isPassword) {
+  Widget _buildTextField(
+      String hintName,
+      String label,
+      TextEditingController textController,
+      bool isPassword,
+      AuthController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -85,8 +90,8 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Padding(
             padding: const EdgeInsets.all(2.0),
             child: TextFormField(
-              controller: controller,
-              obscureText: isPassword ? _obscurePassword : false,
+              controller: textController,
+              obscureText: isPassword ? controller.obscurePassword : false,
               decoration: InputDecoration(
                 hintText: hintName,
                 hintStyle: const TextStyle(color: brandGreySoftColor),
@@ -99,15 +104,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 suffixIcon: isPassword
                     ? IconButton(
                         icon: Icon(
-                          _obscurePassword
+                          controller.obscurePassword
                               ? Icons.visibility_off
                               : Icons.visibility,
                           color: Colors.black,
                         ),
                         onPressed: () {
-                          setState(() {
-                            _obscurePassword = !_obscurePassword;
-                          });
+                          if (controller.obscurePassword) {
+                            controller.obscurePassword = false;
+                          } else {
+                            controller.obscurePassword = true;
+                          }
+                          controller.update();
                         },
                       )
                     : null,
@@ -126,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildSignInButton() {
+  Widget _buildSignInButton(AuthController controller) {
     return Container(
       width: 235,
       height: 50,
@@ -147,8 +155,8 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         onPressed: () {
-          if (_formKey.currentState!.validate()) {
-            Get.offAll(TabsScreen()); // Perform login action
+          if (controller.formKey.currentState!.validate()) {
+            controller.login();
           }
         },
         child: const Text(

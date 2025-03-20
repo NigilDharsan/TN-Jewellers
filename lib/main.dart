@@ -1,19 +1,26 @@
 import 'dart:io';
 import 'dart:ui';
+
 import 'package:TNJewellers/Utils/core/helper/route_helper.dart';
 import 'package:TNJewellers/Utils/core/initial_binding/initial_binding.dart';
 import 'package:TNJewellers/src/splash/controller/splash_controller.dart';
+import 'package:TNJewellers/utils/Loader/Loader.dart';
+import 'package:TNJewellers/utils/Loader/LoaderController.dart';
 import 'package:TNJewellers/utils/app_constants.dart';
 import 'package:TNJewellers/utils/core/theme/controller/theme_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+
 import 'utils/core/theme/dark_theme.dart';
 import 'utils/core/theme/light_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  initControllers();
+
+  Get.put(LoaderController());
+
+  await initControllers();
   await GetStorage.init();
   HttpOverrides.global = MyHttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,7 +72,7 @@ class _MyAppState extends State<MyApp> {
             return Stack(
               children: [
                 child!,
-                // Loader(), // Add the Loader widget here
+                Loader(), // Add the Loader widget here
               ],
             );
           },

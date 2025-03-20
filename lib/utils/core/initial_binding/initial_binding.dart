@@ -2,7 +2,6 @@ import 'package:TNJewellers/src/auth/controller/auth_controller.dart';
 import 'package:TNJewellers/src/auth/repository/auth_repo.dart';
 import 'package:TNJewellers/src/splash/controller/splash_controller.dart';
 import 'package:TNJewellers/src/splash/repository/splash_repo.dart';
-import 'package:TNJewellers/utils/Loader/LoaderController.dart';
 import 'package:TNJewellers/utils/config.dart';
 import 'package:TNJewellers/utils/core/theme/controller/theme_controller.dart';
 import 'package:TNJewellers/utils/data/provider/client_api.dart';
@@ -34,8 +33,6 @@ class InitialBinding extends Bindings {
 }
 
 Future<void> initControllers() async {
-  Get.put(() => LoaderController());
-
   final sharedPreferences = await SharedPreferences.getInstance();
   Get.put<SharedPreferences>(sharedPreferences); // Register it in GetX
 

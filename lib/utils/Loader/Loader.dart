@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:TNJewellers/utils/Loader/LoaderController.dart';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:TNJewellers/utils/images.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class Loader extends StatelessWidget {
   final bool? isLoading;
@@ -44,7 +44,7 @@ class Loader extends StatelessWidget {
                         SizedBox(
                             width: 130,
                             height: 40,
-                            child: Image.asset(Images.hello_axi_logo)),
+                            child: Image.asset(Images.logoPng)),
                         const SizedBox(
                           height: 5,
                           width: 130,
