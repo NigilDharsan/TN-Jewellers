@@ -10,9 +10,13 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController mobileController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
   final TextEditingController companyController = TextEditingController();
+  final TextEditingController mobileController = TextEditingController();
+  final TextEditingController gstController = TextEditingController();
+  final TextEditingController panController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -42,10 +46,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   buildInputField('Company', "Company Name *",
                       companyController, "Please enter your company name"),
                   SizedBox(height: 20),
-                  buildInputField('PAN', "PAN NUMBER *", companyController,
+                  buildInputField('PAN', "PAN NUMBER *", panController,
                       "Please enter your pan number"),
                   SizedBox(height: 20),
-                  buildInputField('GST', "GST NUMBER *", companyController,
+                  buildInputField('GST', "GST NUMBER *", gstController,
                       "Please enter your gst number"),
                   SizedBox(height: 20),
                   buildInputField('Mobile', "Your Mobile No *",
@@ -56,11 +60,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       "Enter a valid email",
                       isEmail: true, isRequired: false),
                   SizedBox(height: 20),
-                  buildInputField('Password', "Password *", companyController,
+                  buildInputField('Password', "Password *", passwordController,
                       "Please enter your password"),
                   SizedBox(height: 20),
                   buildInputField('Password', "Confirm Password *",
-                      companyController, "Please enter your confirm password"),
+                      confirmPasswordController, "Please enter your confirm password"),
                   SizedBox(height: 30),
                   Center(
                     child: Container(

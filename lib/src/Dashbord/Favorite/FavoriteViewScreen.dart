@@ -346,7 +346,7 @@ class _FavoriteViewScreenState extends State<FavoriteViewScreen> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    Get.to(Orderbasicscreen(videoPath: '',));
+                    Get.to(Orderbasicscreen());
                     setState(() {
                       isOrderNowSelected = true; // Select ORDER NOW
                     });

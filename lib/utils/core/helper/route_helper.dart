@@ -65,7 +65,7 @@ class RouteHelper {
     GetPage(name: splash, page: () => const SplashScreen()),
     GetPage(name: onBoardScreen, page: () => getRoute(const LoginScreen())),
     GetPage(name: register, page: () => getRoute(RegisterScreen())),
-    GetPage(name: orderbasicscreen, page: () => getRoute(Orderbasicscreen(videoPath: '',))),
+    GetPage(name: orderbasicscreen, page: () => getRoute(Orderbasicscreen())),
     GetPage(name: ordertwocreen, page: () => getRoute(OrderScreenTwo())),
     GetPage(name: orderthreescreen, page: () => getRoute(OrderScreenThree())),
 

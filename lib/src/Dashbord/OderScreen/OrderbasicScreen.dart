@@ -18,8 +18,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Orderbasicscreen extends StatefulWidget {
-  final String videoPath;
-  const Orderbasicscreen({super.key,required this.videoPath});
+  const Orderbasicscreen({super.key});
 
   @override
   State<Orderbasicscreen> createState() => _OrderbasicscreenState();
@@ -46,14 +45,16 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
   List<Map<String, dynamic>> selectedFiles = [];
   final ImagePicker _imagePicker = ImagePicker();
   final OrderController controller = Get.put(OrderController());
-
+  List<String> photoPaths = [];
+  List<String> videoPaths = [];
+  List<VideoPlayerController> videoControllers = [];
 
   @override
   void initState() {
     super.initState();
     _requestPermissions();
     _loadRecordedFiles();
-    loadSavedFiles();
+    _loadMedia();
     _player.openPlayer();
   }
 
@@ -166,73 +167,147 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
 
 
 
-  Future<void> loadSavedFiles() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedFiles = prefs.getString('selectedFiles');
-    if (savedFiles != null) {
-      List<Map<String, dynamic>> storedFiles =
-      List<Map<String, dynamic>>.from(json.decode(savedFiles));
-      List<Map<String, dynamic>> validFiles = [];
 
-      for (var file in storedFiles) {
-        if (await File(file['path']).exists()) { // Use async exists check
-          validFiles.add(file);
+
+  Future<void> pickMedia(bool isPhoto, bool isCamera) async {
+    XFile? pickedFile;
+    if (isCamera) {
+      pickedFile = isPhoto
+          ? await _imagePicker.pickImage(source: ImageSource.camera)
+          : await _imagePicker.pickVideo(source: ImageSource.camera);
+    } else {
+      if (isPhoto) {
+        List<XFile>? pickedImages = await _imagePicker.pickMultiImage();
+        if (pickedImages != null) {
+          for (var file in pickedImages) {
+            _addMedia(file.path, isPhoto);
+          }
+        }
+      } else {
+        FilePickerResult? result = await FilePicker.platform.pickFiles(
+          type: FileType.video,
+          allowMultiple: true,
+        );
+        if (result != null) {
+          for (var file in result.files) {
+            if (file.path != null) {
+              _addMedia(file.path!, isPhoto);
+            }
+          }
         }
       }
-
-      setState(() {
-        selectedFiles = validFiles;
-      });
-
-      saveFiles(); // Save only valid files again
     }
-  }
-  Future<void> saveFiles() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setString('selectedFiles', json.encode(selectedFiles));
-  }
-  Future<void> _openCamera() async {
-    final XFile? pickedFile = await _imagePicker.pickImage(
-      source: ImageSource.camera,
-    );
+
     if (pickedFile != null) {
-      setState(() {
-        selectedFiles.add({'path': pickedFile.path, 'type': 'image'});
-      });
-      saveFiles();
+      _addMedia(pickedFile.path, isPhoto);
     }
   }
-  Future<void> pickFile(String type) async {
-    String? filePath;
-    if (type == 'image') {
-      final XFile? pickedFile =
-      await _imagePicker.pickImage(source: ImageSource.gallery);
-      filePath = pickedFile?.path;
-    } else if (type == 'video') {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.video,
-      );
-      if (result != null && result.files.single.path != null) {
-        filePath = result.files.single.path!;
-      }
-    }
 
-    if (filePath != null && File(filePath).existsSync()) {
+  void _addMedia(String path, bool isPhoto) {
+    setState(() {
+      selectedFiles.add({'path': path, 'type': isPhoto ? 'image' : 'video'});
+      if (!isPhoto) {
+        VideoPlayerController controller = VideoPlayerController.file(File(path))
+          ..initialize().then((_) {
+            setState(() {});
+          });
+        videoControllers.add(controller);
+      }
+    });
+    _saveMedia();
+  }
+
+  Future<void> _saveMedia() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selectedFiles', json.encode(selectedFiles));
+  }
+
+  Future<void> _loadMedia() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? storedFiles = prefs.getString('selectedFiles');
+    if (storedFiles != null) {
+      List<dynamic> files = json.decode(storedFiles);
       setState(() {
-        selectedFiles.add({'path': filePath, 'type': type});
+        selectedFiles = files.cast<Map<String, dynamic>>();
+        for (var file in selectedFiles) {
+          if (file['type'] == 'video') {
+            VideoPlayerController controller = VideoPlayerController.file(File(file['path']))
+              ..initialize().then((_) {
+                setState(() {});
+              });
+            videoControllers.add(controller);
+          }
+        }
       });
-      saveFiles();
     }
   }
-  void removeFile(int index) {
+
+  void _clearSingleMedia(int index) {
     setState(() {
+      if (selectedFiles[index]['type'] == 'video') {
+        videoControllers[index].dispose();
+        videoControllers.removeAt(index);
+      }
       selectedFiles.removeAt(index);
     });
-    saveFiles();
+    _saveMedia();
   }
 
+  void _showMediaOptions(bool isCamera) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_camera, color: Colors.blue),
+              title: const Text("Take Photo"),
+              onTap: () {
+                Navigator.pop(context);
+                pickMedia(true, isCamera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.videocam, color: Colors.blue),
+              title: const Text("Take Video"),
+              onTap: () {
+                Navigator.pop(context);
+                pickMedia(false, isCamera);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
-
+  void _showuploadMediaOptions(bool isCamera) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_camera, color: Colors.blue),
+              title: const Text("Photo"),
+              onTap: () {
+                Navigator.pop(context);
+                pickMedia(true, isCamera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.videocam, color: Colors.blue),
+              title: const Text("Video"),
+              onTap: () {
+                Navigator.pop(context);
+                pickMedia(false, isCamera);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
 
 
@@ -270,17 +345,17 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                 children: [
                   Expanded(
                     child: buildAttachmentSection(
-                      label: "Take Camera\nPhoto",
-                      icon: Icons.camera_alt,
-                      onPick: _openCamera,
+                      label: "Take a Camera\nPhoto",
+                      icon: Icons.camera_alt_outlined,
+                      onPick: () => _showMediaOptions(true),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: buildAttachmentSection(
-                      label: "Upload Media\nPhoto",
-                      icon: Icons.image,
-                      onPick: _showMediaSelectionDialog,
+                      label: "Upload image\nvideo",
+                      icon: Icons.link,
+                      onPick: () => _showuploadMediaOptions(false),
                     ),
                   ),
                 ],
@@ -288,14 +363,14 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
               const SizedBox(height: 20),
               SizedBox(
                 height: 120,
-                child: ListView.builder(
+                child: ListView(
                   scrollDirection: Axis.horizontal,
-                  itemCount: selectedFiles.length,
-                  itemBuilder: (context, index) {
-                    return buildMediaContainer(selectedFiles[index], index);
-                  },
+                  children: List.generate(selectedFiles.length, (index) {
+                    return buildMediaItem(selectedFiles[index]['path'], selectedFiles[index]['type'] == 'video', index);
+                  }),
                 ),
               ),
+
               SizedBox(height: 20),
               Align(
                 alignment: Alignment.centerLeft,
@@ -384,103 +459,76 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
     );
   }
 
-  Widget buildAttachmentSection({
-    required String label,
-    required IconData icon,
-    required VoidCallback onPick,
-  }) {
+  Widget buildAttachmentSection({required String label, required IconData icon, required VoidCallback onPick}) {
     return GestureDetector(
       onTap: onPick,
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white70,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(10),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 5,
-              offset: Offset(0, 1),
-            ),
-          ],
+          boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, 1))],
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [Icon(icon), const SizedBox(width: 10), Text(label)],
         ),
       ),
     );
   }
 
-  Widget buildMediaContainer(Map<String, dynamic> file, int index) {
-    File mediaFile = File(file['path']);
-    return mediaFile.existsSync()
-        ? Stack(
-      children: [
-        Container(
-          width: 120,
-          height: 100,
-          margin: const EdgeInsets.symmetric(horizontal: 5),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.grey),
-          ),
-          child: file['type'] == 'image'
-              ? ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.file(
-              mediaFile,
-              fit: BoxFit.cover,
-            ),
-          )
-              : Orderbasicscreen(videoPath: file['path']),
-        ),
-        Positioned(
-          top: 5,
-          right: 5,
-          child: GestureDetector(
-            onTap: () => removeFile(index),
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-              ),
-              padding: const EdgeInsets.all(4),
-              child: const Icon(Icons.close, size: 18, color: Colors.white),
-            ),
-          ),
-        ),
-      ],
-    )
-        : const Center(child: Text("File not found!"));
-  }
 
-  void _showMediaSelectionDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Select Media Type"),
-          content: const Text("Do you want to upload an image or a video?"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Close dialog
-                pickFile('image'); // Pick Image
-              },
-              child: const Text("Image"),
+
+  Widget buildMediaItem(String path, bool isVideo, int index) {
+    return Padding(
+      padding: const EdgeInsets.all(5),
+      child: Stack(
+        children: [
+          Opacity(
+            opacity: 0.5,
+          child:Container(
+            width: 150,
+            height: 200,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(10),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Close dialog
-                pickFile('video'); // Pick Video
+            child: isVideo && videoControllers.length > index && videoControllers[index].value.isInitialized
+                ? GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (videoControllers[index].value.isPlaying) {
+                    videoControllers[index].pause();
+                  } else {
+                    videoControllers[index].play();
+                  }
+                });
               },
-              child: const Text("Video"),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  VideoPlayer(videoControllers[index]),
+                  if (!videoControllers[index].value.isPlaying)
+                    const Icon(Icons.play_circle_fill, color: Colors.white, size: 40),
+                ],
+              ),
+            )
+                : Image.file(File(path), fit: BoxFit.cover),
+          ),),
+          Positioned(
+            top: 0,
+            right: 1,
+            child: IconButton(
+              icon: const Icon(Icons.cancel_outlined, color: Colors.red,size: 40,),
+              onPressed: () => _clearSingleMedia(index),
             ),
-          ],
-        );
-      },
+          ),
+        ],
+      ),
     );
   }
+
+
 
   Widget _buildDescriptionContainer() {
     return Column(

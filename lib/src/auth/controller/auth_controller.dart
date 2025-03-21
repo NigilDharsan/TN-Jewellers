@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:TNJewellers/src/Dashbord/TabScreen.dart';
 import 'package:TNJewellers/src/auth/repository/auth_repo.dart';
+import 'package:TNJewellers/src/auth/signIn/LoginScreen.dart';
 import 'package:TNJewellers/utils/Loader/loader_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -31,7 +32,7 @@ class AuthController extends GetxController implements GetxService {
   bool obscurePassword = true;
 
   ///TextEditingController for signUp screen
-  var firstNameController = TextEditingController();
+  var nameController = TextEditingController();
   var lastNameController = TextEditingController();
   var emailController = TextEditingController();
   var phoneController = TextEditingController();
@@ -138,7 +139,6 @@ class AuthController extends GetxController implements GetxService {
   String htmlPageContent = '';
   int notificationCount = 0;
   String selectedLanguage = 'English';
-
   var expandedIndex = (-1).obs;
 
   void toggleExpanded(int index) {
@@ -150,7 +150,7 @@ class AuthController extends GetxController implements GetxService {
   @override
   void onInit() {
     super.onInit();
-    firstNameController.text = '';
+    nameController.text = '';
     lastNameController.text = '';
     emailController.text = '';
     phoneController.text = '';
@@ -211,26 +211,46 @@ class AuthController extends GetxController implements GetxService {
     _hideKeyboard();
     _isLoading = true;
     loaderController.showLoaderAfterBuild(_isLoading);
-
     update();
-
     Response? response = await authRepo.login(
         email: emailController.value.text,
         password: passwordController.value.text);
     if (response != null && response.statusCode == 200) {
       print("LOGIN RESPONSE ${response.body}");
       String accessToken = response.body['token'];
-
       emailController.clear();
       passwordController.clear();
       Get.offAll(TabsScreen()); // Perform login action
     }
-
     _isLoading = false;
     loaderController.showLoaderAfterBuild(_isLoading);
-
     update();
   }
+
+
+  // Future<void> signupVerification() async {
+  //   _hideKeyboard();
+  //   _isLoading = true;
+  //   loaderController.showLoaderAfterBuild(_isLoading);
+  //   update();
+  //   Response? response = await authRepo.signupVerification(
+  //       email: emailController.value.text,
+  //       password: passwordController.value.text);
+  //   if (response != null && response.statusCode == 200) {
+  //     print("LOGIN RESPONSE ${response.body}");
+  //     String accessToken = response.body['token'];
+  //     emailController.clear();
+  //     passwordController.clear();
+  //     Get.offAll(TabsScreen()); // Perform login action
+  //   }
+  //   _isLoading = false;
+  //   loaderController.showLoaderAfterBuild(_isLoading);
+  //   update();
+  // }
+
+
+
+
 
   // //forgot password
   // Future<void> forgetPasswordOTP({required String isVerifyEmail}) async {
@@ -352,15 +372,11 @@ class AuthController extends GetxController implements GetxService {
     //     isEstablishmentRequired: isEstablishment,
     //     gstinNumber: gstinNumberController.text,
     //   );
-
     //   print("ESTABLISHMNET ID ${selectedEstablishment?.id}");
     //   final response = await authRepo.editProfile(user);
-
     //   if (response != null && response.statusCode == 200) {
     //     await getUserProfile(false);
-
     //     Get.back();
-
     //     customSnackBar("Profile_Updated_Successfully".tr, isError: false);
     //   }
     // }
@@ -372,10 +388,7 @@ class AuthController extends GetxController implements GetxService {
   Timer? _refreshTokenTimer;
 
   void startRefreshTokenTimer() {
-    // Cancel any existing timer before starting a new one
     _refreshTokenTimer?.cancel();
-
-    // Start a new timer that triggers every 5 minutes
     _refreshTokenTimer = Timer.periodic(Duration(minutes: 10), (timer) {});
   }
 

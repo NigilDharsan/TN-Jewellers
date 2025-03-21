@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:TNJewellers/utils/app_constants.dart';
 import 'package:TNJewellers/utils/data/provider/client_api.dart';
 import 'package:get/get.dart';
@@ -34,16 +36,43 @@ class AuthRepo {
   }
 
   Future<Response?> signupVerification(
-      String validateStr, String verifyStr) async {
-    Map<String, String> headers = {
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Accept': '*/*'
-    };
+      String name,
+       String companyName,
+       String mobile,
+       String gstNumber,
+       String panNumber,
+       String email,
+       String password,
 
+      ) async {
+    Map<String, String> headers = {
+      "name": name,
+      "companyName": companyName,
+      "mobile": mobile,
+      "gstNumber": gstNumber,
+      "panNumber": panNumber,
+      "email": email,
+      "password": password,
+    };
     return await apiClient.getData(
         headers: headers,
-        "${AppConstants.customerSignup}/$validateStr/$verifyStr");
+        AppConstants.customerSignup);
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // Future<Response?> forgetPasswordOTP(String email,
   //     {required String isVerifyEmail}) async {
