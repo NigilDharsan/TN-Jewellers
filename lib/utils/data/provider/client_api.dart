@@ -2,14 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart' as foundation;
-import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:TNJewellers/src/auth/controller/auth_controller.dart';
 import 'package:TNJewellers/utils/config.dart';
 import 'package:TNJewellers/utils/core/common_model/errors_model.dart';
 import 'package:TNJewellers/utils/widgets/custom_snackbar.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' as foundation;
+import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';

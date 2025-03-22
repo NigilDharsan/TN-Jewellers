@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:TNJewellers/src/Dashbord/TabScreen.dart';
 import 'package:TNJewellers/src/auth/repository/auth_repo.dart';
-import 'package:TNJewellers/src/auth/signIn/LoginScreen.dart';
 import 'package:TNJewellers/utils/Loader/loader_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -29,20 +28,20 @@ class AuthController extends GetxController implements GetxService {
   }
 
   final formKey = GlobalKey<FormState>();
+  final formKeySignUP = GlobalKey<FormState>();
+
   bool obscurePassword = true;
 
   ///TextEditingController for signUp screen
-  var nameController = TextEditingController();
-  var lastNameController = TextEditingController();
-  var emailController = TextEditingController();
-  var phoneController = TextEditingController();
-  var passwordController = TextEditingController();
-  var confirmPasswordController = TextEditingController();
-  var address = TextEditingController();
-  var preferLocation = TextEditingController();
-  var countryDialCodeController = TextEditingController();
-  var countryNameController = TextEditingController();
-  var operationArea = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController companyController = TextEditingController();
+  final TextEditingController mobileController = TextEditingController();
+  final TextEditingController gstController = TextEditingController();
+  final TextEditingController panController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   bool isEstablishment = false;
 
@@ -130,15 +129,8 @@ class AuthController extends GetxController implements GetxService {
   int? selectedLocationIndex;
 
   final TextEditingController searchController = TextEditingController();
-  List suggestions = [];
-  double latitude = 0.0;
-  double longitude = 0.0;
   String? sessionToken;
   bool isLocationSelected = false;
-  int pickupBeforeDays = 0;
-  String htmlPageContent = '';
-  int notificationCount = 0;
-  String selectedLanguage = 'English';
   var expandedIndex = (-1).obs;
 
   void toggleExpanded(int index) {
@@ -151,9 +143,7 @@ class AuthController extends GetxController implements GetxService {
   void onInit() {
     super.onInit();
     nameController.text = '';
-    lastNameController.text = '';
     emailController.text = '';
-    phoneController.text = '';
     passwordController.text = '';
     confirmPasswordController.text = '';
     contactNumberController.text = '';
@@ -213,8 +203,8 @@ class AuthController extends GetxController implements GetxService {
     loaderController.showLoaderAfterBuild(_isLoading);
     update();
     Response? response = await authRepo.login(
-        email: emailController.value.text,
-        password: passwordController.value.text);
+        email: signInEmailController.value.text,
+        password: signInPasswordController.value.text);
     if (response != null && response.statusCode == 200) {
       print("LOGIN RESPONSE ${response.body}");
       String accessToken = response.body['token'];
@@ -227,30 +217,43 @@ class AuthController extends GetxController implements GetxService {
     update();
   }
 
+  Future<void> signupVerification() async {
+    _hideKeyboard();
+    _isLoading = true;
+    loaderController.showLoaderAfterBuild(_isLoading);
+    update();
 
-  // Future<void> signupVerification() async {
-  //   _hideKeyboard();
-  //   _isLoading = true;
-  //   loaderController.showLoaderAfterBuild(_isLoading);
-  //   update();
-  //   Response? response = await authRepo.signupVerification(
-  //       email: emailController.value.text,
-  //       password: passwordController.value.text);
-  //   if (response != null && response.statusCode == 200) {
-  //     print("LOGIN RESPONSE ${response.body}");
-  //     String accessToken = response.body['token'];
-  //     emailController.clear();
-  //     passwordController.clear();
-  //     Get.offAll(TabsScreen()); // Perform login action
-  //   }
-  //   _isLoading = false;
-  //   loaderController.showLoaderAfterBuild(_isLoading);
-  //   update();
-  // }
+    Map<String, String> body = {
+      "firstname": nameController.value.text,
+      "lastname": "null",
+      // "company_name": companyController.value.text,
+      "mobile": mobileController.value.text,
+      "gst_number": gstController.value.text,
+      "pan_number": panController.value.text,
+      "email": emailController.value.text,
+      "confirm_password": confirmPasswordController.value.text,
+      "cus_type": "2",
+      "registered_through": "2"
+    };
 
+    Response? response = await authRepo.signupVerification(body);
+    if (response != null && response.statusCode == 200) {
+      print("LOGIN RESPONSE ${response.body}");
+      nameController.clear();
+      companyController.clear();
+      panController.clear();
+      gstController.clear();
+      mobileController.clear();
+      passwordController.clear();
+      confirmPasswordController.clear();
+      emailController.clear();
 
-
-
+      Get.offAll(TabsScreen()); // Perform login action
+    }
+    _isLoading = false;
+    loaderController.showLoaderAfterBuild(_isLoading);
+    update();
+  }
 
   // //forgot password
   // Future<void> forgetPasswordOTP({required String isVerifyEmail}) async {

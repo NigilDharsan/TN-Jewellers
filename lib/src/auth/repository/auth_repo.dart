@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:TNJewellers/utils/app_constants.dart';
 import 'package:TNJewellers/utils/data/provider/client_api.dart';
 import 'package:get/get.dart';
@@ -23,10 +21,6 @@ class AuthRepo {
 
   Future<Response?> login(
       {required String email, required String password}) async {
-    //Ynl1ZnVlbC1zcGEtY2xpZW50LXB3ZDpxbjlJZXlSV0gxbUV1RE1JNHJKZ0FVVFYwZXdCdkJWNQ==
-
-    // byufuel-spa-client-mob-pwd' + ':' + 'AkfoTMTmUmPC6oWK0N2a8eaNNIUANMuW',
-
     var body = {"password": password, "username": email};
 
     return await apiClient.postLoginData(
@@ -35,44 +29,14 @@ class AuthRepo {
     );
   }
 
-  Future<Response?> signupVerification(
-      String name,
-       String companyName,
-       String mobile,
-       String gstNumber,
-       String panNumber,
-       String email,
-       String password,
-
-      ) async {
-    Map<String, String> headers = {
-      "name": name,
-      "companyName": companyName,
-      "mobile": mobile,
-      "gstNumber": gstNumber,
-      "panNumber": panNumber,
-      "email": email,
-      "password": password,
+  Future<Response?> signupVerification(Map<String, String> body) async {
+    final headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
     };
-    return await apiClient.getData(
-        headers: headers,
-        AppConstants.customerSignup);
+    return await apiClient.postData(AppConstants.customerSignup, body,
+        headers: headers);
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   // Future<Response?> forgetPasswordOTP(String email,
   //     {required String isVerifyEmail}) async {

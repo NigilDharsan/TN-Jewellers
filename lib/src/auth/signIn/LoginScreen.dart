@@ -1,4 +1,3 @@
-import 'package:TNJewellers/src/Dashbord/TabScreen.dart';
 import 'package:TNJewellers/src/auth/controller/auth_controller.dart';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:TNJewellers/utils/core/helper/route_helper.dart';
@@ -41,12 +40,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     _buildTextField(
                         'Enter your text here',
                         'LOGIN/USER NAME/EMAIL',
-                        controller.emailController,
+                        controller.signInEmailController,
                         false,
                         controller),
                     const SizedBox(height: 20),
                     _buildTextField('Enter your text here', 'PASSWORD',
-                        controller.passwordController, true, controller),
+                        controller.signInPasswordController, true, controller),
                     const SizedBox(height: 30),
                     _buildSignInButton(controller),
                     const SizedBox(height: 30),

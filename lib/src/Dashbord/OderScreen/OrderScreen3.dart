@@ -1,9 +1,5 @@
-import 'package:TNJewellers/src/Dashbord/Favorite/FavoriteViewScreen.dart';
-import 'package:TNJewellers/src/Dashbord/OderScreen/StepIndicator.dart';
-import 'package:TNJewellers/utils/colors.dart';
-import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 
 class OrderScreenThree extends StatefulWidget {
   const OrderScreenThree({super.key});
@@ -26,137 +22,89 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
     }
   }
 
-  void nextStep() {
-    Get.to(() => const FavoriteViewScreen());
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Create New Order')),
-      body: SingleChildScrollView(child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 10),
-            StepIndicator(currentStep: currentStep),
-            SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextWithValue('Customer Name', 'NIKIL'),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _buildTextWithValue('Invoice Number', 'THOJR-123'),
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextWithValue('Work Order Type', 'NEW SIZE'),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _buildTextWithValue('Art No/Browse Catalog', 'BNG7685-23'),
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildUploadDocumentSection(),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _buildAudioSection(),
-                ),
-              ],
-            ),
-            SizedBox(height: 15),
-            _buildDescriptionContainer(),
-            SizedBox(height: 15),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextWithValue('Product Type', 'RING'),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child:
-                      _buildTextWithValue('Invoice/Ref No', 'THOJR-03-03-25'),
-                ),
-              ],
-            ),
-            SizedBox(height: 15),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextWithValue('Required Weight', '12 GRAMS'),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _buildTextWithValue('Dimensions(mm)', '15 WX 12 H'),
-                ),
-              ],
-            ),
-            SizedBox(height: 15),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextWithValue('Stone Required', 'DIAMOND'),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _buildTextWithValue('Stone Weight', '3 GRAMS'),
-                ),
-              ],
-            ),
-            SizedBox(height: 15),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextWithValue('Stone quality code', 'XXXXXX123'),
-                ),
-              ],
-            ),
-            SizedBox(height: 15),
-            Container(
-              width: double.infinity,
-              height: 50,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: brandPrimaryColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10,
-                    offset: Offset(0, 5),
+    return Expanded(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTextWithValue('Customer Name', 'NIKIL'),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildTextWithValue('Invoice Number', 'THOJR-123'),
                   ),
                 ],
               ),
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: brandPrimaryColor),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
+              SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildUploadDocumentSection(),
                   ),
-                ),
-                onPressed: nextStep,
-                child: const Text(
-                  'ORDER NOW',
-                  style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold, color: white4),
-                ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildAudioSection(),
+                  ),
+                ],
               ),
-            ),
-          ],
+              SizedBox(height: 15),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTextWithValue('Product Type', 'RING'),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildTextWithValue('Design', 'THOJR-03-03-25'),
+                  ),
+                ],
+              ),
+              SizedBox(height: 15),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTextWithValue('Required Weight', '12 GRAMS'),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildTextWithValue('Size', '15 WX 12 H'),
+                  ),
+                ],
+              ),
+              SizedBox(height: 15),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTextWithValue('Stone', 'DIAMOND'),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildTextWithValue('Stone Weight', '3 GRAMS'),
+                  ),
+                ],
+              ),
+              SizedBox(height: 15),
+              _buildTextWithValue('Expected Delivery Date', 'XXXXXX123'),
+              SizedBox(height: 15),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTextWithValue('Description', 'XXXXXX123'),
+                  ),
+                ],
+              ),
+              SizedBox(height: 15),
+            ],
+          ),
         ),
-      ),),
+      ),
     );
   }
 
@@ -228,7 +176,7 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
           child: Row(
             children: [
               Icon(Icons.audiotrack, color: Colors.green),
-               Text('audio.01.mp3'),
+              Text('audio.01.mp3'),
               Icon(Icons.download, color: Colors.blue),
               Icon(Icons.play_arrow, color: Colors.red),
             ],

@@ -1,11 +1,10 @@
 import 'dart:async';
+
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:TNJewellers/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'OrderScreen3.dart';
-import 'StepIndicator.dart';
 
 class OrderScreenTwo extends StatefulWidget {
   const OrderScreenTwo({super.key});
@@ -70,9 +69,7 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
     super.dispose();
   }
 
-  void nextStep() {
-    Get.to(() => const OrderScreenThree());
-  }
+  void nextStep() {}
 
   void previousStep() {
     Get.back();
@@ -80,172 +77,115 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Create New Order')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Center(
-              child: Text('Create New Order',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            ),
-            const SizedBox(height: 10),
-            StepIndicator(currentStep: currentStep),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildDropdownRow(
-                      'PRODUCT TYPE', ['Ring', 'Gold'], selectedProduct,
-                      (value) {
-                    setState(() => selectedProduct = value);
-                  }),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _buildDropdownRow(
-                      'MATERIAL', ['Gold', 'Ring'], selectedMaterial, (value) {
-                    setState(() => selectedMaterial = value);
-                  }),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextFieldRow(
-                      'REQUIRED WEIGHT', '12 Grams', weightController),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _buildDimensionsRow(),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildDropdownRow(
-                      'STONE REQUIRED', ['Diamond', 'Ruby'], selectedDiamond,
-                      (value) {
-                    setState(() => selectedDiamond = value);
-                  }),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _buildTextFieldRow(
-                      'STONE WEIGHT', '3 Grams', stoneWeightController),
-                ),
-              ],
-            ),
-            _buildDropdownRow(
-                'STONE QUALITY CODE', ['XX234', 'XXX678'], selectedStone,
-                (value) {
-              setState(() => selectedStone = value);
-            }),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildDropdownRow(
-                    'ORDER QUANTITY',
-                    ['2 Pieces', '3 Pieces'],
-                    selectedquantity,
-                    (value) {
-                      setState(() => selectedquantity = value);
-                    },
-                  ),
-                ),
-                const SizedBox(width: 10), // Spacing between elements
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "EXPECTED DELIVERY DATE",
-                        style: Order2,
-                      ),
-                      SizedBox(height: 5),
-                      GestureDetector(
-                        child: Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 5,
-                                offset: Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.calendar_today, color: Colors.grey),
-                              SizedBox(width:2),
-                              Expanded(
-                                child: TextFormField(
-                                  controller: inputController,
-                                  keyboardType: TextInputType.number,
-                                  readOnly: isDateDisplayed,
-                                  // If date is shown, disable typing
-                                  decoration: InputDecoration(
-                                    labelText: "Enter number of days",
-                                    border: InputBorder.none,
-                                    suffixIcon: isDateDisplayed
-                                        ? IconButton(
-                                            icon: Icon(Icons.clear),
-                                            onPressed: _clearInput,
-                                          )
-                                        : null,
-                                  ),
-                                  onChanged: _startConversionTimer,
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _buildTextFieldRow(
+                    'PRODUCT TYPE *', 'Product', stoneWeightController),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildTextFieldRow(
+                    'DESIGN', 'Design', stoneWeightController),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: _buildTextFieldRow(
+                    'REQUIRED WEIGHT *', '12 Grams', weightController),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildDimensionsRow(),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child:
+                    _buildTextFieldRow('STONE', 'Stone', stoneWeightController),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildTextFieldRow(
+                    'STONE WEIGHT', 'weight', stoneWeightController),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: _buildTextFieldRow(
+                    'ORDER QUANTITY', 'Quantity', stoneWeightController),
+              ),
+
+              const SizedBox(width: 10), // Spacing between elements
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "EXPECTED DELIVERY DATE *",
+                      style: Order2,
+                    ),
+                    SizedBox(height: 5),
+                    GestureDetector(
+                      child: Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 5,
+                              offset: Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.calendar_today, color: Colors.grey),
+                            SizedBox(width: 2),
+                            Expanded(
+                              child: TextFormField(
+                                controller: inputController,
+                                keyboardType: TextInputType.number,
+                                readOnly: isDateDisplayed,
+                                // If date is shown, disable typing
+                                decoration: InputDecoration(
+                                  labelText: "Enter number of days",
+                                  border: InputBorder.none,
+                                  suffixIcon: isDateDisplayed
+                                      ? IconButton(
+                                          icon: Icon(Icons.clear),
+                                          onPressed: _clearInput,
+                                        )
+                                      : null,
                                 ),
+                                onChanged: _startConversionTimer,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Container(
-              width: double.infinity,
-              height: 50,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: brandPrimaryColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10,
-                    offset: Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: brandPrimaryColor),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ),
-                onPressed: nextStep,
-                child: const Text(
-                  'Next',
-                  style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold, color: white4),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+          const SizedBox(height: 20),
+        ],
       ),
     );
   }
@@ -286,13 +226,13 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('DIMENSIONS (MM)', style: Order2),
+          const Text('SIZE', style: Order2),
           const SizedBox(height: 5),
           Row(
             children: [
-              Expanded(child: _buildTextField('Width', widthController)),
+              Expanded(child: _buildTextField('Ex:1.5', widthController)),
               const SizedBox(width: 10),
-              Expanded(child: _buildTextField('Height', heightController)),
+              Expanded(child: _buildTextField('inch', heightController)),
             ],
           ),
         ],
