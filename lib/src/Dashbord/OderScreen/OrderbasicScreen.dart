@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:TNJewellers/src/Dashbord/OderScreen/OrderScreen2.dart';
 import 'package:TNJewellers/src/Dashbord/OderScreen/OrderScreen3.dart';
 import 'package:TNJewellers/src/Dashbord/OderScreen/StepIndicator.dart';
@@ -30,6 +29,8 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController firstnameController = TextEditingController();
   final TextEditingController invoiceController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+
   String? selectedAudioFile;
   String? selectedPhoto;
   String? selectedVideo;
@@ -119,8 +120,7 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
     });
     _loadRecordedFiles();
   }
-
-  Future<void> _playSegment(String filePath, int seconds) async {
+  Future<void> _playSegment(String filePath) async {
     if (_isPlaying) {
       await _player.stopPlayer();
       setState(() {
@@ -128,10 +128,11 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
         _playbackProgress = 0.0;
         _currentFilePath = null;
       });
+      return;
     }
 
-    _currentFilePath = filePath; // Set currently playing file
-    _selectedDuration = Duration(seconds: seconds);
+    _currentFilePath = filePath;
+    setState(() => _isPlaying = true);
 
     await _player.startPlayer(
       fromURI: filePath,
@@ -145,10 +146,8 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
       },
     );
 
-    setState(() => _isPlaying = true);
-
-    double interval = 0.1; // Update every 100ms
-    int totalUpdates = (seconds / interval).ceil();
+    double interval = 0.1;
+    int totalUpdates = (5 / interval).ceil();
     int currentUpdate = 0;
 
     Timer.periodic(Duration(milliseconds: (interval * 1000).toInt()), (timer) {
@@ -168,6 +167,57 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
       }
     });
   }
+  void _downloadRecording(String filePath) {
+    print("Downloading: $filePath");
+  }
+  // Future<void> _playSegment(String filePath, int seconds) async {
+  //   if (_isPlaying) {
+  //     await _player.stopPlayer();
+  //     setState(() {
+  //       _isPlaying = false;
+  //       _playbackProgress = 0.0;
+  //       _currentFilePath = null;
+  //     });
+  //   }
+  //
+  //   _currentFilePath = filePath; // Set currently playing file
+  //   _selectedDuration = Duration(seconds: seconds);
+  //
+  //   await _player.startPlayer(
+  //     fromURI: filePath,
+  //     codec: Codec.aacMP4,
+  //     whenFinished: () {
+  //       setState(() {
+  //         _isPlaying = false;
+  //         _playbackProgress = 0.0;
+  //         _currentFilePath = null;
+  //       });
+  //     },
+  //   );
+  //
+  //   setState(() => _isPlaying = true);
+  //
+  //   double interval = 0.1; // Update every 100ms
+  //   int totalUpdates = (seconds / interval).ceil();
+  //   int currentUpdate = 0;
+  //
+  //   Timer.periodic(Duration(milliseconds: (interval * 1000).toInt()), (timer) {
+  //     if (!_isPlaying || currentUpdate >= totalUpdates) {
+  //       timer.cancel();
+  //       _player.stopPlayer();
+  //       setState(() {
+  //         _isPlaying = false;
+  //         _playbackProgress = 0.0;
+  //         _currentFilePath = null;
+  //       });
+  //     } else {
+  //       setState(() {
+  //         _playbackProgress = currentUpdate / totalUpdates;
+  //       });
+  //       currentUpdate++;
+  //     }
+  //   });
+  // }
 
   Future<void> pickMedia(bool isPhoto, bool isCamera) async {
     XFile? pickedFile;
@@ -208,10 +258,10 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
       selectedFiles.add({'path': path, 'type': isPhoto ? 'image' : 'video'});
       if (!isPhoto) {
         VideoPlayerController controller =
-            VideoPlayerController.file(File(path))
-              ..initialize().then((_) {
-                setState(() {});
-              });
+        VideoPlayerController.file(File(path))
+          ..initialize().then((_) {
+            setState(() {});
+          });
         videoControllers.add(controller);
       }
     });
@@ -233,10 +283,10 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
         for (var file in selectedFiles) {
           if (file['type'] == 'video') {
             VideoPlayerController controller =
-                VideoPlayerController.file(File(file['path']))
-                  ..initialize().then((_) {
-                    setState(() {});
-                  });
+            VideoPlayerController.file(File(file['path']))
+              ..initialize().then((_) {
+                setState(() {});
+              });
             videoControllers.add(controller);
           }
         }
@@ -315,11 +365,11 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
     // await Get.find<OrderController>().orderCreateResponse();
 
     if (Get.find<OrderController>().screenType.value == "orderone") {
-      Get.find<OrderController>().screenType.value = "oredertwo";
+      Get.find<OrderController>().screenType.value = "ordertwo";
       setState(() {
         currentStep = 2;
       });
-    } else if (Get.find<OrderController>().screenType.value == "oredertwo") {
+    } else if (Get.find<OrderController>().screenType.value == "ordertwo") {
       Get.find<OrderController>().screenType.value = "orderthree";
       setState(() {
         currentStep = 3;
@@ -331,7 +381,6 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     Get.find<OrderController>().screenType.value = "orderone";
   }
@@ -347,95 +396,109 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
   }
 
   Widget _buildBody(OrderController controller) {
-    return Column(
+    return
+       Column(
       children: [
         SizedBox(height: 10),
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: StepIndicator(currentStep: currentStep),
         ),
-        controller.screenType.value == "oredertwo"
+        controller.screenType.value == "ordertwo"
             ? OrderScreenTwo()
             : controller.screenType.value == "orderthree"
-                ? OrderScreenThree()
-                : Expanded(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.all(16.0),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: 20),
-                            _buildTextField('Enter your nickname', 'NICK NAME',
-                                firstnameController, false),
-                            SizedBox(height: 10),
-                            _buildTextField('Enter Invoice/Ref No',
-                                'INVOICE/REF NO', invoiceController, false),
-                            SizedBox(height: 20),
-                            Text(
-                              "UPLOAD PHOTO REFERENCE *",
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: brandGreyColor),
-                            ),
-                            SizedBox(height: 5),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: buildAttachmentSection(
-                                    label: "Take a Camera\nPhoto",
-                                    icon: Icons.camera_alt_outlined,
-                                    onPick: () => _showMediaOptions(true),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: buildAttachmentSection(
-                                    label: "Upload image\nvideo",
-                                    icon: Icons.link,
-                                    onPick: () =>
-                                        _showuploadMediaOptions(false),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Text(
-                              "RECORD/ATTACH AUDIO *",
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: brandGreyColor),
-                            ),
-                            SizedBox(height: 5),
-                            SizedBox(
-                              height: 120 * selectedFiles.length.toDouble(),
-                              child: ListView(
-                                padding: EdgeInsets.zero,
-                                scrollDirection: Axis.horizontal,
-                                children: List.generate(selectedFiles.length,
-                                    (index) {
-                                  return buildMediaItem(
-                                      selectedFiles[index]['path'],
-                                      selectedFiles[index]['type'] == 'video',
-                                      index);
-                                }),
-                              ),
-                            ),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: buildAudioAttachment(),
-                            ),
-                            SizedBox(height: 20),
-                            _buildDescriptionContainer(),
-                            SizedBox(height: 20),
-                          ],
+            ? OrderScreenThree()
+            : Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 20),
+                  _buildTextField('Enter your nickname', 'NICK NAME',
+                      firstnameController, false),
+                  SizedBox(height: 10),
+                  _buildTextField('Enter Invoice/Ref No',
+                      'INVOICE/REF NO', invoiceController, false),
+                  SizedBox(height: 20),
+                  Text(
+                    "UPLOAD PHOTO REFERENCE *",
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: brandGreyColor),
+                  ),
+                  SizedBox(height: 5),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: buildAttachmentSection(
+                          label: "Take a Camera\nPhoto",
+                          icon: Icons.camera_alt_outlined,
+                          onPick: () => _showMediaOptions(true),
                         ),
                       ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: buildAttachmentSection(
+                          label: "Upload image\nvideo",
+                          icon: Icons.link,
+                          onPick: () =>
+                              _showuploadMediaOptions(false),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "RECORD/ATTACH AUDIO *",
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: brandGreyColor),
+                  ),
+                  SizedBox(height: 5),
+                  SizedBox(
+                    height: 100 * selectedFiles.length.toDouble(),
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      scrollDirection: Axis.horizontal,
+                      children: List.generate(selectedFiles.length,
+                              (index) {
+                            return buildMediaItem(
+                                selectedFiles[index]['path'],
+                                selectedFiles[index]['type'] == 'video',
+                                index);
+                          }),
                     ),
                   ),
+                  buildAudioAttachment(
+                    isRecording: _isRecording,
+                    elapsedTime: '$_elapsedTime',
+                    recordedFiles: _recordedFiles,
+                    onRecord: _startRecording,
+                    onStop: _stopRecording,// Fixed typo
+                    onDelete: _deleteRecording,
+                    onPlay: _playSegment,
+                    onDownload: _downloadRecording,
+                    currentFilePath: _currentFilePath ?? "",
+                    isPlaying: _isPlaying,
+                    playbackProgress: _playbackProgress,
+                  ),
+                  _buildDescriptionContainer(
+                    'Description', // Label outside
+                    'Some text description change the customer looking for retailers',
+                    // Hint inside the box
+                    descriptionController,
+                  ),
+                  SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Container(
@@ -470,6 +533,7 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
         ),
         SizedBox(height: 40),
       ],
+
     );
   }
 
@@ -517,25 +581,40 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
     );
   }
 
-  Widget buildAttachmentSection(
-      {required String label,
-      required IconData icon,
-      required VoidCallback onPick}) {
+  Widget buildAttachmentSection({
+    required String label,
+    required IconData icon,
+    required VoidCallback onPick,
+  }) {
     return GestureDetector(
-      onTap: onPick,
+      onTap: onPick, // Triggers when tapping anywhere on the container
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-                color: Colors.black26, blurRadius: 5, offset: Offset(0, 1))
+              color: Colors.black26,
+              blurRadius: 5,
+              offset: Offset(0, 1),
+            ),
           ],
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [Icon(icon), const SizedBox(width: 10), Text(label)],
+        child: TextFormField(
+          readOnly: true,
+          decoration: InputDecoration(
+            hintText: label,
+            prefixIcon: Icon(icon, color: Colors.black),
+            hintStyle: const TextStyle(color: brandGreySoftColor),
+            filled: true,
+            fillColor: brandGoldLightColor,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+          ),
+          onTap: onPick, // Triggers when tapping inside the TextField
         ),
       ),
     );
@@ -555,28 +634,28 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: isVideo &&
-                      videoControllers.length > index &&
-                      videoControllers[index].value.isInitialized
+                  videoControllers.length > index &&
+                  videoControllers[index].value.isInitialized
                   ? GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          if (videoControllers[index].value.isPlaying) {
-                            videoControllers[index].pause();
-                          } else {
-                            videoControllers[index].play();
-                          }
-                        });
-                      },
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          VideoPlayer(videoControllers[index]),
-                          if (!videoControllers[index].value.isPlaying)
-                            const Icon(Icons.play_circle_fill,
-                                color: Colors.white, size: 40),
-                        ],
-                      ),
-                    )
+                onTap: () {
+                  setState(() {
+                    if (videoControllers[index].value.isPlaying) {
+                      videoControllers[index].pause();
+                    } else {
+                      videoControllers[index].play();
+                    }
+                  });
+                },
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    VideoPlayer(videoControllers[index]),
+                    if (!videoControllers[index].value.isPlaying)
+                      const Icon(Icons.play_circle_fill,
+                          color: Colors.white, size: 40),
+                  ],
+                ),
+              )
                   : Image.file(File(path), fit: BoxFit.cover),
             ),
           ),
@@ -597,144 +676,150 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
     );
   }
 
-  Widget _buildDescriptionContainer() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Description *',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        SizedBox(height: 5),
-        Container(
-          padding: EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.grey),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 4,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-          child: TextFormField(
-            maxLines: 5,
-            decoration: InputDecoration(
-              hintText: 'Enter your description here',
-              hintStyle: TextStyle(color: Colors.grey),
-              border: InputBorder.none,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildContentValue(String label, String value) {
+  Widget _buildDescriptionContainer(
+      String label,
+      String hintText,
+      TextEditingController controller,
+      ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+              fontSize: 14, fontWeight: FontWeight.bold, color: brandGreyColor),
         ),
-        SizedBox(height: 5),
-        Text(
-          value,
-          style: TextStyle(fontSize: 12),
+        const SizedBox(height: 5),
+        Container(
+          padding: const EdgeInsets.all(2),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 5,
+                offset: Offset(0, 1),
+              ),
+            ],
+          ),
+          child: TextFormField(
+            controller: controller,
+            maxLines: 3, // Allows better input for descriptions
+            decoration: InputDecoration(
+              hintText: hintText,
+              // Hint text inside box
+              hintStyle: const TextStyle(color: brandGreySoftColor),
+              // brandGreySoftColor
+              filled: true,
+              fillColor: brandGoldLightColor,
+              // brandGoldLightColor
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
         ),
       ],
     );
   }
 
-  Widget buildAudioAttachment() {
+  Widget buildAudioAttachment({
+    required bool isRecording,
+    required String elapsedTime,
+    required List<String> recordedFiles,
+    required VoidCallback onRecord,
+    required VoidCallback onStop,
+    required void Function(int index) onDelete,
+    required void Function(String filePath) onPlay,
+    required void Function(String filePath) onDownload,
+    required String currentFilePath,
+    required bool isPlaying,
+    required double playbackProgress,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
-          onTap: () {
-            if (_isRecording) {
-              _stopRecording();
-            } else {
-              _startRecording();
-            }
-          },
+          onTap: isRecording ? onStop : onRecord, // Stop recording if active
           child: Container(
-            width: 220,
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            width: 170,
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: _isRecording
-                  ? Colors.grey[200]
-                  : Colors.grey[200], // Change color when recording
+              color: brandGoldLightColor, // Inside fill color
+              borderRadius: BorderRadius.circular(10), // Inner border radius
+              border: Border.all(color: Colors.white, width: 2), // White border with width 2
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 5,
+                  offset: Offset(0, 1),
+                ),
+              ],
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    Icon(
-                      _isRecording ? Icons.stop : Icons.mic,
-                      color: Colors.black,
-                    ),
-                    SizedBox(width: 5),
-                    Text(
-                      _isRecording
-                          ? "$_elapsedTime sec" // Show elapsed time when recording
-                          : "ATTACH AUDIO: $_elapsedTime sec",
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
+                Icon(isRecording ? Icons.stop : Icons.mic, color: Colors.black),
+                const SizedBox(width: 10),
+                Text(
+                  isRecording ? "$elapsedTime sec" : "ATTACH AUDIO",
+                  style: TextStyle(color: brandGreySoftColor),
                 ),
               ],
             ),
           ),
         ),
-        SizedBox(
-          height: 30 * _recordedFiles.length.toDouble(),
-          child: ListView.builder(
-            itemCount: _recordedFiles.length,
+
+        const SizedBox(height: 10),
+        if (recordedFiles.isNotEmpty)
+          ListView.builder(
+            shrinkWrap: true,
+            itemCount: recordedFiles.length,
             itemBuilder: (context, index) {
-              String filePath = _recordedFiles[index];
+              String filePath = recordedFiles[index];
               return Column(
                 children: [
                   ListTile(
                     leading: IconButton(
                       icon: Icon(
-                        _isPlaying && _currentFilePath == filePath
+                        _isPlaying &&
+                            _currentFilePath == filePath
                             ? Icons.stop
                             : Icons.play_arrow,
                         color: Colors.deepPurple,
                       ),
                       onPressed: () {
-                        if (_isPlaying && _currentFilePath == filePath) {
+                        if (_isPlaying &&
+                            _currentFilePath == filePath) {
                           _stopRecording();
                         } else {
-                          _playSegment(filePath, 5); // Plays for 5 seconds
+                          _playSegment(filePath); // Plays for 5 seconds
                         }
                       },
                     ),
-                    title: Text(filePath.split('/').last),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
-                      onPressed: () => _deleteRecording(index),
+                    title: Text(filePath.split('/').last, overflow: TextOverflow.ellipsis),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.download, color: Colors.blue),
+                          onPressed: () => onDownload(filePath),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => onDelete(index),
+                        ),
+                      ],
                     ),
                   ),
-                  LinearProgressIndicator(
-                    value: (_isPlaying && _currentFilePath == filePath)
-                        ? _playbackProgress
-                        : 0.0,
-                  ),
+                  if (isPlaying && currentFilePath == filePath)
+                    LinearProgressIndicator(value: playbackProgress),
                 ],
               );
             },
           ),
-        ),
       ],
     );
   }

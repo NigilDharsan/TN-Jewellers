@@ -24,8 +24,8 @@ class RouteHelper {
   static const String favoriteScreen = '/favoriteScreen';
   static const String dashboardscreen = '/dashboardscreen';
   static const String profilescreen = '/profilescreen';
-  static const String orderbasicscreen = '/orderscreen';
-  static const String ordertwocreen = '/ordertwo';
+  static const String orderbasicscreen = '/orderone';
+  static const String ordertwoscreen = '/ordertwo';
 
   static const String orderthreescreen = '/orderthree';
 
@@ -48,7 +48,7 @@ class RouteHelper {
   static String getDashBoardRoute() => dashboardscreen;
   static String getProfileRoute() => profilescreen;
   static String getOrderbasicscreenRoute() => orderbasicscreen;
-  static String getOrderScreenTwoRoute() => ordertwocreen;
+  static String getOrderScreenTwoRoute() => ordertwoscreen;
   static String getOrderScreenThreeRoute() => orderthreescreen;
 
   static String getRiderHistoryRoute() => riderhistoryscreen;
@@ -66,7 +66,7 @@ class RouteHelper {
     GetPage(name: onBoardScreen, page: () => getRoute(const LoginScreen())),
     GetPage(name: register, page: () => getRoute(RegisterScreen())),
     GetPage(name: orderbasicscreen, page: () => getRoute(Orderbasicscreen())),
-    GetPage(name: ordertwocreen, page: () => getRoute(OrderScreenTwo())),
+    GetPage(name: ordertwoscreen, page: () => getRoute(OrderScreenTwo())),
     GetPage(name: orderthreescreen, page: () => getRoute(OrderScreenThree())),
 
 

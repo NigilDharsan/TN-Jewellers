@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:TNJewellers/utils/styles.dart';
 import 'package:flutter/material.dart';
@@ -138,12 +137,12 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
                     ),
                     SizedBox(height: 5),
                     GestureDetector(
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                      child:  Container(
+                        padding: const EdgeInsets.all(2),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: brandGoldLightColor, // Light grey background
                           borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.white, width: 2), // White border with width 2
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black26,
@@ -161,9 +160,9 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
                                 controller: inputController,
                                 keyboardType: TextInputType.number,
                                 readOnly: isDateDisplayed,
-                                // If date is shown, disable typing
                                 decoration: InputDecoration(
                                   labelText: "Enter number of days",
+                                  labelStyle: TextStyle(color: brandGreySoftColor), // Set label text color to grey
                                   border: InputBorder.none,
                                   suffixIcon: isDateDisplayed
                                       ? IconButton(
@@ -252,7 +251,7 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
             borderSide: BorderSide.none, // No border
           ),
           filled: true,
-          fillColor: white5, // Ensuring background remains grey
+          fillColor: brandGoldLightColor, // Ensuring background remains grey
         ),
         items: items.map((item) {
           return DropdownMenuItem(value: item, child: Text(item));
@@ -263,16 +262,32 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
   }
 
   Widget _buildTextField(String hint, TextEditingController controller) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        hintText: hint,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none, // No border
+    return Container(
+      padding: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 5,
+            offset: Offset(0, 1),
+          ),
+        ],
+      ),
+      child: TextFormField(
+        controller: controller,
+        maxLines: 1, // Allows better input for descriptions
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(color: brandGreySoftColor),
+          filled: true,
+          fillColor: brandGoldLightColor,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
         ),
-        filled: true,
-        fillColor: white5, // Ensuring background remains grey
       ),
     );
   }
