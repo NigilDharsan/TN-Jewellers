@@ -9,8 +9,23 @@ class OrderController extends GetxController implements GetxService {
 
   OrderController({required this.orderRepo});
 
-  var screenType = "".obs; // Observable variable
+  var screenType = "orderone".obs; // Observable variable
   bool _isLoading = false;
+
+  final TextEditingController firstnameController = TextEditingController();
+  final TextEditingController invoiceController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+
+  final TextEditingController productTypeController = TextEditingController();
+  final TextEditingController designController = TextEditingController();
+  final TextEditingController weightController = TextEditingController();
+  final TextEditingController sizeController = TextEditingController();
+  final TextEditingController inchController = TextEditingController();
+  final TextEditingController stoneController = TextEditingController();
+  final TextEditingController stoneWeightController = TextEditingController();
+  final TextEditingController quantityController = TextEditingController();
+  final TextEditingController deliveryDateController = TextEditingController();
+
   _hideKeyboard() => FocusManager.instance.primaryFocus?.unfocus();
 
   Future<void> orderCreateResponse() async {
@@ -54,6 +69,7 @@ class OrderController extends GetxController implements GetxService {
     if (response != null && response.statusCode == 200) {
       print("LOGIN RESPONSE ${response.body}");
       customSnackBar("Order Placed Successfully", isError: false);
+      Get.back();
     }
     _isLoading = false;
     loaderController.showLoaderAfterBuild(_isLoading);

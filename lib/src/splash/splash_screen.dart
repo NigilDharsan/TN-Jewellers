@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:TNJewellers/src/auth/controller/auth_controller.dart';
 import 'package:TNJewellers/src/auth/repository/auth_repo.dart';
 import 'package:TNJewellers/utils/core/helper/route_helper.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../utils/overlay_loader_with_app_icon.dart';
 
@@ -66,10 +66,10 @@ class SplashScreenState extends State<SplashScreen> {
     // Get.find<SplashController>().getConfigData().then((value) {
     Timer(const Duration(seconds: 2), () async {
       if (Get.find<AuthController>().isLoggedIn()) {
-        Get.offAllNamed(RouteHelper.getSignInRoute());
+        Get.offAllNamed(RouteHelper.getDashBoardRoute());
         SingleTon().LoginType == 'supplier';
       } else {
-        Get.offAllNamed(RouteHelper.getSignInRoute());
+        Get.toNamed(RouteHelper.getSignInRoute());
       }
     });
   }

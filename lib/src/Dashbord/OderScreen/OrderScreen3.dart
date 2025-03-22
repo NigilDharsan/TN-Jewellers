@@ -1,5 +1,7 @@
+import 'package:TNJewellers/src/Dashbord/OderScreen/controller/OrderController.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class OrderScreenThree extends StatefulWidget {
   const OrderScreenThree({super.key});
@@ -24,6 +26,12 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
 
   @override
   Widget build(BuildContext context) {
+    return GetBuilder<OrderController>(builder: (controller) {
+      return _buildBody(controller);
+    });
+  }
+
+  Widget _buildBody(OrderController controller) {
     return Expanded(
       child: SingleChildScrollView(
         child: Padding(
@@ -34,11 +42,13 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildTextWithValue('Customer Name', 'NIKIL'),
+                    child: _buildTextWithValue(
+                        'Customer Name', controller.firstnameController.text),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildTextWithValue('Invoice Number', 'THOJR-123'),
+                    child: _buildTextWithValue(
+                        'Invoice Number', controller.invoiceController.text),
                   ),
                 ],
               ),
@@ -50,11 +60,13 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildTextWithValue('Product Type', 'RING'),
+                    child: _buildTextWithValue(
+                        'Product Type', controller.productTypeController.text),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildTextWithValue('Design', 'THOJR-03-03-25'),
+                    child: _buildTextWithValue(
+                        'Design', controller.designController.text),
                   ),
                 ],
               ),
@@ -62,7 +74,8 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildTextWithValue('Required Weight', '12 GRAMS'),
+                    child: _buildTextWithValue(
+                        'Required Weight', controller.weightController.text),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -74,21 +87,25 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildTextWithValue('Stone', 'DIAMOND'),
+                    child: _buildTextWithValue(
+                        'Stone', controller.stoneController.text),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildTextWithValue('Stone Weight', '3 GRAMS'),
+                    child: _buildTextWithValue(
+                        'Stone Weight', controller.stoneWeightController.text),
                   ),
                 ],
               ),
               SizedBox(height: 15),
-              _buildTextWithValue('Expected Delivery Date', 'XXXXXX123'),
+              _buildTextWithValue('Expected Delivery Date',
+                  controller.deliveryDateController.text),
               SizedBox(height: 15),
               Row(
                 children: [
                   Expanded(
-                    child: _buildTextWithValue('Description', 'XXXXXX123'),
+                    child: _buildTextWithValue(
+                        'Description', controller.descriptionController.text),
                   ),
                 ],
               ),

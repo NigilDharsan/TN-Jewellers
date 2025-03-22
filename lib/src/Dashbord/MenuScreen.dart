@@ -3,6 +3,7 @@ import 'package:TNJewellers/src/Product/ProductScreen.dart';
 import 'package:TNJewellers/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../../utils/colors.dart';
 import '../../utils/images.dart';
 
@@ -63,7 +64,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 Text('Welcome',
                     style: JosefinSansRegular, textScaleFactor: 0.8),
                 SizedBox(height: 3), // Reduce spacing for small height
-                Text('ARTISA JEWELLERS',
+                Text('TN JEWELLERS',
                     style: JosefinSansBold, textScaleFactor: 0.8),
               ],
             ),

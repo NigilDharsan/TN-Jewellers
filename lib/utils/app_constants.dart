@@ -1,5 +1,5 @@
 class AppConstants {
-  static const String appName = 'Hello Taxi';
+  static const String appName = 'TN Jewellers';
 
   static const String configUrl = 'configs';
   static const String onBoards = 'on-boards';

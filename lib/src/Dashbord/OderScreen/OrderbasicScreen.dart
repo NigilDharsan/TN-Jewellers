@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:TNJewellers/src/Dashbord/OderScreen/OrderScreen2.dart';
 import 'package:TNJewellers/src/Dashbord/OderScreen/OrderScreen3.dart';
 import 'package:TNJewellers/src/Dashbord/OderScreen/StepIndicator.dart';
 import 'package:TNJewellers/src/Dashbord/OderScreen/controller/OrderController.dart';
 import 'package:TNJewellers/utils/colors.dart';
+import 'package:TNJewellers/utils/widgets/custom_text_field.dart';
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -27,9 +29,6 @@ class Orderbasicscreen extends StatefulWidget {
 
 class _OrderbasicscreenState extends State<Orderbasicscreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController firstnameController = TextEditingController();
-  final TextEditingController invoiceController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
 
   String? selectedAudioFile;
   String? selectedPhoto;
@@ -120,6 +119,7 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
     });
     _loadRecordedFiles();
   }
+
   Future<void> _playSegment(String filePath) async {
     if (_isPlaying) {
       await _player.stopPlayer();
@@ -167,6 +167,7 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
       }
     });
   }
+
   void _downloadRecording(String filePath) {
     print("Downloading: $filePath");
   }
@@ -258,10 +259,10 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
       selectedFiles.add({'path': path, 'type': isPhoto ? 'image' : 'video'});
       if (!isPhoto) {
         VideoPlayerController controller =
-        VideoPlayerController.file(File(path))
-          ..initialize().then((_) {
-            setState(() {});
-          });
+            VideoPlayerController.file(File(path))
+              ..initialize().then((_) {
+                setState(() {});
+              });
         videoControllers.add(controller);
       }
     });
@@ -283,10 +284,10 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
         for (var file in selectedFiles) {
           if (file['type'] == 'video') {
             VideoPlayerController controller =
-            VideoPlayerController.file(File(file['path']))
-              ..initialize().then((_) {
-                setState(() {});
-              });
+                VideoPlayerController.file(File(file['path']))
+                  ..initialize().then((_) {
+                    setState(() {});
+                  });
             videoControllers.add(controller);
           }
         }
@@ -375,8 +376,37 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
         currentStep = 3;
       });
     } else {
-      Get.back();
+      await Get.find<OrderController>().orderCreateResponse();
     }
+  }
+
+  void _showExitConfirmation(BuildContext context, OrderController controller) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Confirm Exit"),
+          content:
+              Text("Are you sure you want to go back? All data will be lost."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                // controller.clearData(); // Clear form or data
+                Navigator.pop(context); // Close the dialog
+                Get.back();
+              },
+              child: Text("Yes, Exit", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -388,7 +418,28 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Create New Order')),
+      appBar: AppBar(
+        title: Text('Create New Order'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Get.find<OrderController>().screenType.value == "orderthree") {
+              Get.find<OrderController>().screenType.value = "ordertwo";
+              setState(() {
+                currentStep = 2;
+              });
+            } else if (Get.find<OrderController>().screenType.value ==
+                "ordertwo") {
+              Get.find<OrderController>().screenType.value = "orderone";
+              setState(() {
+                currentStep = 1; //orderone
+              });
+            } else {
+              _showExitConfirmation(context, Get.find<OrderController>());
+            }
+          },
+        ),
+      ),
       body: GetBuilder<OrderController>(builder: (controller) {
         return _buildBody(controller);
       }),
@@ -396,8 +447,7 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
   }
 
   Widget _buildBody(OrderController controller) {
-    return
-       Column(
+    return Column(
       children: [
         SizedBox(height: 10),
         Padding(
@@ -407,98 +457,105 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
         controller.screenType.value == "ordertwo"
             ? OrderScreenTwo()
             : controller.screenType.value == "orderthree"
-            ? OrderScreenThree()
-            : Expanded(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 20),
-                  _buildTextField('Enter your nickname', 'NICK NAME',
-                      firstnameController, false),
-                  SizedBox(height: 10),
-                  _buildTextField('Enter Invoice/Ref No',
-                      'INVOICE/REF NO', invoiceController, false),
-                  SizedBox(height: 20),
-                  Text(
-                    "UPLOAD PHOTO REFERENCE *",
-                    style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: brandGreyColor),
-                  ),
-                  SizedBox(height: 5),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: buildAttachmentSection(
-                          label: "Take a Camera\nPhoto",
-                          icon: Icons.camera_alt_outlined,
-                          onPick: () => _showMediaOptions(true),
+                ? OrderScreenThree()
+                : Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.all(16.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            buildInputField(
+                                'Enter your nickname',
+                                "NICK NAME",
+                                controller.firstnameController,
+                                "Please enter your name",
+                                isRequired: false),
+                            SizedBox(height: 10),
+                            buildInputField(
+                                'Enter Invoice/Ref No',
+                                "INVOICE/REF NO",
+                                controller.invoiceController,
+                                "",
+                                isRequired: false),
+                            SizedBox(height: 20),
+                            Text(
+                              "UPLOAD PHOTO REFERENCE *",
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: brandGreyColor),
+                            ),
+                            SizedBox(height: 5),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: buildAttachmentSection(
+                                    label: "Take a Camera\nPhoto",
+                                    icon: Icons.camera_alt_outlined,
+                                    onPick: () => _showMediaOptions(true),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: buildAttachmentSection(
+                                    label: "Upload image\nvideo",
+                                    icon: Icons.link,
+                                    onPick: () =>
+                                        _showuploadMediaOptions(false),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              "RECORD/ATTACH AUDIO *",
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: brandGreyColor),
+                            ),
+                            SizedBox(height: 5),
+                            SizedBox(
+                              height: 100 * selectedFiles.length.toDouble(),
+                              child: ListView(
+                                padding: EdgeInsets.zero,
+                                scrollDirection: Axis.horizontal,
+                                children: List.generate(selectedFiles.length,
+                                    (index) {
+                                  return buildMediaItem(
+                                      selectedFiles[index]['path'],
+                                      selectedFiles[index]['type'] == 'video',
+                                      index);
+                                }),
+                              ),
+                            ),
+                            buildAudioAttachment(
+                              isRecording: _isRecording,
+                              elapsedTime: '$_elapsedTime',
+                              recordedFiles: _recordedFiles,
+                              onRecord: _startRecording,
+                              onStop: _stopRecording, // Fixed typo
+                              onDelete: _deleteRecording,
+                              onPlay: _playSegment,
+                              onDownload: _downloadRecording,
+                              currentFilePath: _currentFilePath ?? "",
+                              isPlaying: _isPlaying,
+                              playbackProgress: _playbackProgress,
+                            ),
+                            _buildDescriptionContainer(
+                              'Description', // Label outside
+                              'Some text description change the customer looking for retailers',
+                              // Hint inside the box
+                              controller.descriptionController,
+                            ),
+                            SizedBox(height: 20),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: buildAttachmentSection(
-                          label: "Upload image\nvideo",
-                          icon: Icons.link,
-                          onPick: () =>
-                              _showuploadMediaOptions(false),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    "RECORD/ATTACH AUDIO *",
-                    style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: brandGreyColor),
-                  ),
-                  SizedBox(height: 5),
-                  SizedBox(
-                    height: 100 * selectedFiles.length.toDouble(),
-                    child: ListView(
-                      padding: EdgeInsets.zero,
-                      scrollDirection: Axis.horizontal,
-                      children: List.generate(selectedFiles.length,
-                              (index) {
-                            return buildMediaItem(
-                                selectedFiles[index]['path'],
-                                selectedFiles[index]['type'] == 'video',
-                                index);
-                          }),
                     ),
                   ),
-                  buildAudioAttachment(
-                    isRecording: _isRecording,
-                    elapsedTime: '$_elapsedTime',
-                    recordedFiles: _recordedFiles,
-                    onRecord: _startRecording,
-                    onStop: _stopRecording,// Fixed typo
-                    onDelete: _deleteRecording,
-                    onPlay: _playSegment,
-                    onDownload: _downloadRecording,
-                    currentFilePath: _currentFilePath ?? "",
-                    isPlaying: _isPlaying,
-                    playbackProgress: _playbackProgress,
-                  ),
-                  _buildDescriptionContainer(
-                    'Description', // Label outside
-                    'Some text description change the customer looking for retailers',
-                    // Hint inside the box
-                    descriptionController,
-                  ),
-                  SizedBox(height: 20),
-                ],
-              ),
-            ),
-          ),
-        ),
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Container(
@@ -523,8 +580,8 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                 ),
               ),
               onPressed: nextStep,
-              child: const Text(
-                'Next',
+              child: Text(
+                currentStep == 3 ? 'Place Order' : "Next",
                 style: TextStyle(
                     fontSize: 16, fontWeight: FontWeight.bold, color: white4),
               ),
@@ -532,51 +589,6 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
           ),
         ),
         SizedBox(height: 40),
-      ],
-
-    );
-  }
-
-  Widget _buildTextField(String hintName, String label,
-      TextEditingController controller, bool isPassword) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-              fontSize: 14, fontWeight: FontWeight.bold, color: brandGreyColor),
-        ),
-        const SizedBox(height: 5),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 5,
-                offset: Offset(0, 1),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: TextFormField(
-              controller: controller,
-              decoration: InputDecoration(
-                hintText: hintName,
-                hintStyle: const TextStyle(color: brandGreySoftColor),
-                filled: true,
-                fillColor: brandGoldLightColor,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -634,28 +646,28 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: isVideo &&
-                  videoControllers.length > index &&
-                  videoControllers[index].value.isInitialized
+                      videoControllers.length > index &&
+                      videoControllers[index].value.isInitialized
                   ? GestureDetector(
-                onTap: () {
-                  setState(() {
-                    if (videoControllers[index].value.isPlaying) {
-                      videoControllers[index].pause();
-                    } else {
-                      videoControllers[index].play();
-                    }
-                  });
-                },
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    VideoPlayer(videoControllers[index]),
-                    if (!videoControllers[index].value.isPlaying)
-                      const Icon(Icons.play_circle_fill,
-                          color: Colors.white, size: 40),
-                  ],
-                ),
-              )
+                      onTap: () {
+                        setState(() {
+                          if (videoControllers[index].value.isPlaying) {
+                            videoControllers[index].pause();
+                          } else {
+                            videoControllers[index].play();
+                          }
+                        });
+                      },
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          VideoPlayer(videoControllers[index]),
+                          if (!videoControllers[index].value.isPlaying)
+                            const Icon(Icons.play_circle_fill,
+                                color: Colors.white, size: 40),
+                        ],
+                      ),
+                    )
                   : Image.file(File(path), fit: BoxFit.cover),
             ),
           ),
@@ -677,10 +689,10 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
   }
 
   Widget _buildDescriptionContainer(
-      String label,
-      String hintText,
-      TextEditingController controller,
-      ) {
+    String label,
+    String hintText,
+    TextEditingController controller,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -749,7 +761,8 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
             decoration: BoxDecoration(
               color: brandGoldLightColor, // Inside fill color
               borderRadius: BorderRadius.circular(10), // Inner border radius
-              border: Border.all(color: Colors.white, width: 2), // White border with width 2
+              border: Border.all(
+                  color: Colors.white, width: 2), // White border with width 2
               boxShadow: [
                 BoxShadow(
                   color: Colors.black26,
@@ -771,7 +784,6 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
             ),
           ),
         ),
-
         const SizedBox(height: 10),
         if (recordedFiles.isNotEmpty)
           ListView.builder(
@@ -784,22 +796,21 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                   ListTile(
                     leading: IconButton(
                       icon: Icon(
-                        _isPlaying &&
-                            _currentFilePath == filePath
+                        _isPlaying && _currentFilePath == filePath
                             ? Icons.stop
                             : Icons.play_arrow,
                         color: Colors.deepPurple,
                       ),
                       onPressed: () {
-                        if (_isPlaying &&
-                            _currentFilePath == filePath) {
+                        if (_isPlaying && _currentFilePath == filePath) {
                           _stopRecording();
                         } else {
                           _playSegment(filePath); // Plays for 5 seconds
                         }
                       },
                     ),
-                    title: Text(filePath.split('/').last, overflow: TextOverflow.ellipsis),
+                    title: Text(filePath.split('/').last,
+                        overflow: TextOverflow.ellipsis),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

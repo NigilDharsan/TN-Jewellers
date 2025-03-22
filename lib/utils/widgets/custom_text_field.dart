@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:TNJewellers/utils/dimensions.dart';
 import 'package:TNJewellers/utils/images.dart';
 import 'package:TNJewellers/utils/styles.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 
 class CustomTextField extends StatefulWidget {
   final String? hintText;
@@ -764,6 +764,77 @@ Widget signInPassword(context,
       textInputAction: TextInputAction.next,
       keyboardType: keyboardtype,
       style: Textfield_Style,
+    ),
+  );
+}
+
+Widget buildInputField(String hintName, String label,
+    TextEditingController controller, String errorMsg,
+    {bool isNumber = false, bool isEmail = false, bool isRequired = true}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      SizedBox(height: 15),
+      Text(label.toUpperCase(),
+          style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[700])),
+      SizedBox(height: 5),
+      Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 5,
+              offset: Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(1.0),
+          child: TextFormField(
+            controller: controller,
+            keyboardType: isNumber ? TextInputType.phone : TextInputType.text,
+            validator: (value) {
+              if (isRequired && (value == null || value.isEmpty))
+                return errorMsg;
+              if (isEmail &&
+                  !RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}')
+                      .hasMatch(value!)) return "Enter a valid email";
+              return null;
+            },
+            decoration: customInputDecoration(hintName),
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+InputDecoration customInputDecoration(String hintText) {
+  return InputDecoration(
+    filled: true,
+    fillColor: brandGoldLightColor,
+    hintText: hintText,
+    hintStyle: TextStyle(color: brandGreySoftColor),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: BorderSide(color: Colors.white, width: 2), // White border
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: BorderSide(color: Colors.white, width: 2),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: BorderSide(color: Colors.white, width: 2),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: BorderSide(color: Colors.transparent, width: 2),
     ),
   );
 }

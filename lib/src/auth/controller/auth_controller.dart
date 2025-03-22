@@ -210,8 +210,8 @@ class AuthController extends GetxController implements GetxService {
       String accessToken = response.body['token'];
       await authRepo.saveUserToken(accessToken);
 
-      emailController.clear();
-      passwordController.clear();
+      signInEmailController.clear();
+      signInPasswordController.clear();
       Get.offAll(TabsScreen()); // Perform login action
     }
     _isLoading = false;
@@ -250,7 +250,7 @@ class AuthController extends GetxController implements GetxService {
       confirmPasswordController.clear();
       emailController.clear();
 
-      Get.offAll(TabsScreen()); // Perform login action
+      Get.back(); // Perform login action
     }
     _isLoading = false;
     loaderController.showLoaderAfterBuild(_isLoading);
