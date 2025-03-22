@@ -1,10 +1,5 @@
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-
-class OrderController extends GetxController {
-  var screenType = "".obs; // Observable variable
-}
 
 class StepIndicator extends StatelessWidget {
   final int currentStep;

@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:TNJewellers/src/Dashbord/OderScreen/OrderScreen2.dart';
 import 'package:TNJewellers/src/Dashbord/OderScreen/OrderScreen3.dart';
 import 'package:TNJewellers/src/Dashbord/OderScreen/StepIndicator.dart';
+import 'package:TNJewellers/src/Dashbord/OderScreen/controller/OrderController.dart';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
@@ -45,7 +46,6 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
   Duration? _selectedDuration;
   List<Map<String, dynamic>> selectedFiles = [];
   final ImagePicker _imagePicker = ImagePicker();
-  final OrderController controller = Get.put(OrderController());
   List<String> photoPaths = [];
   List<String> videoPaths = [];
   List<VideoPlayerController> videoControllers = [];
@@ -311,14 +311,16 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
     );
   }
 
-  void nextStep() {
-    if (controller.screenType.value == "") {
-      controller.screenType.value = "oredertwo";
+  Future<void> nextStep() async {
+    // await Get.find<OrderController>().orderCreateResponse();
+
+    if (Get.find<OrderController>().screenType.value == "orderone") {
+      Get.find<OrderController>().screenType.value = "oredertwo";
       setState(() {
         currentStep = 2;
       });
-    } else if (controller.screenType.value == "oredertwo") {
-      controller.screenType.value = "orderthree";
+    } else if (Get.find<OrderController>().screenType.value == "oredertwo") {
+      Get.find<OrderController>().screenType.value = "orderthree";
       setState(() {
         currentStep = 3;
       });
@@ -331,137 +333,143 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    controller.screenType.value = "orderone";
+    Get.find<OrderController>().screenType.value = "orderone";
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Create New Order')),
-      body: Column(
-        children: [
-          SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: StepIndicator(currentStep: currentStep),
-          ),
-          controller.screenType.value == "oredertwo"
-              ? OrderScreenTwo()
-              : controller.screenType.value == "orderthree"
-                  ? OrderScreenThree()
-                  : Expanded(
-                      child: SingleChildScrollView(
-                        padding: EdgeInsets.all(16.0),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 20),
-                              _buildTextField('Enter your nickname',
-                                  'NICK NAME', firstnameController, false),
-                              SizedBox(height: 10),
-                              _buildTextField('Enter Invoice/Ref No',
-                                  'INVOICE/REF NO', invoiceController, false),
-                              SizedBox(height: 20),
-                              Text(
-                                "UPLOAD PHOTO REFERENCE *",
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: brandGreyColor),
-                              ),
-                              SizedBox(height: 5),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: buildAttachmentSection(
-                                      label: "Take a Camera\nPhoto",
-                                      icon: Icons.camera_alt_outlined,
-                                      onPick: () => _showMediaOptions(true),
-                                    ),
+      body: GetBuilder<OrderController>(builder: (controller) {
+        return _buildBody(controller);
+      }),
+    );
+  }
+
+  Widget _buildBody(OrderController controller) {
+    return Column(
+      children: [
+        SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: StepIndicator(currentStep: currentStep),
+        ),
+        controller.screenType.value == "oredertwo"
+            ? OrderScreenTwo()
+            : controller.screenType.value == "orderthree"
+                ? OrderScreenThree()
+                : Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.all(16.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 20),
+                            _buildTextField('Enter your nickname', 'NICK NAME',
+                                firstnameController, false),
+                            SizedBox(height: 10),
+                            _buildTextField('Enter Invoice/Ref No',
+                                'INVOICE/REF NO', invoiceController, false),
+                            SizedBox(height: 20),
+                            Text(
+                              "UPLOAD PHOTO REFERENCE *",
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: brandGreyColor),
+                            ),
+                            SizedBox(height: 5),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: buildAttachmentSection(
+                                    label: "Take a Camera\nPhoto",
+                                    icon: Icons.camera_alt_outlined,
+                                    onPick: () => _showMediaOptions(true),
                                   ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: buildAttachmentSection(
-                                      label: "Upload image\nvideo",
-                                      icon: Icons.link,
-                                      onPick: () =>
-                                          _showuploadMediaOptions(false),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 20),
-                              Text(
-                                "RECORD/ATTACH AUDIO *",
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: brandGreyColor),
-                              ),
-                              SizedBox(height: 5),
-                              SizedBox(
-                                height: 120 * selectedFiles.length.toDouble(),
-                                child: ListView(
-                                  padding: EdgeInsets.zero,
-                                  scrollDirection: Axis.horizontal,
-                                  children: List.generate(selectedFiles.length,
-                                      (index) {
-                                    return buildMediaItem(
-                                        selectedFiles[index]['path'],
-                                        selectedFiles[index]['type'] == 'video',
-                                        index);
-                                  }),
                                 ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: buildAttachmentSection(
+                                    label: "Upload image\nvideo",
+                                    icon: Icons.link,
+                                    onPick: () =>
+                                        _showuploadMediaOptions(false),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              "RECORD/ATTACH AUDIO *",
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: brandGreyColor),
+                            ),
+                            SizedBox(height: 5),
+                            SizedBox(
+                              height: 120 * selectedFiles.length.toDouble(),
+                              child: ListView(
+                                padding: EdgeInsets.zero,
+                                scrollDirection: Axis.horizontal,
+                                children: List.generate(selectedFiles.length,
+                                    (index) {
+                                  return buildMediaItem(
+                                      selectedFiles[index]['path'],
+                                      selectedFiles[index]['type'] == 'video',
+                                      index);
+                                }),
                               ),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: buildAudioAttachment(),
-                              ),
-                              SizedBox(height: 20),
-                              _buildDescriptionContainer(),
-                              SizedBox(height: 20),
-                            ],
-                          ),
+                            ),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: buildAudioAttachment(),
+                            ),
+                            SizedBox(height: 20),
+                            _buildDescriptionContainer(),
+                            SizedBox(height: 20),
+                          ],
                         ),
                       ),
                     ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Container(
-              width: double.infinity,
-              height: 50,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: brandPrimaryColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10,
-                    offset: Offset(0, 5),
                   ),
-                ],
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Container(
+            width: double.infinity,
+            height: 50,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: brandPrimaryColor,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: Offset(0, 5),
+                ),
+              ],
+            ),
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: brandPrimaryColor),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
               ),
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: brandPrimaryColor),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ),
-                onPressed: nextStep,
-                child: const Text(
-                  'Next',
-                  style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold, color: white4),
-                ),
+              onPressed: nextStep,
+              child: const Text(
+                'Next',
+                style: TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.bold, color: white4),
               ),
             ),
           ),
-          SizedBox(height: 40),
-        ],
-      ),
+        ),
+        SizedBox(height: 40),
+      ],
     );
   }
 

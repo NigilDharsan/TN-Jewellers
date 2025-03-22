@@ -1,3 +1,5 @@
+import 'package:TNJewellers/src/Dashbord/OderScreen/controller/OrderController.dart';
+import 'package:TNJewellers/src/Dashbord/OderScreen/repository/OrderRepo.dart';
 import 'package:TNJewellers/src/auth/controller/auth_controller.dart';
 import 'package:TNJewellers/src/auth/repository/auth_repo.dart';
 import 'package:TNJewellers/src/splash/controller/splash_controller.dart';
@@ -25,7 +27,10 @@ class InitialBinding extends Bindings {
         authRepo:
             AuthRepo(sharedPreferences: Get.find(), apiClient: Get.find())));
 
-    // Get.lazyPut(() => SignalRServices());
+    Get.lazyPut(() => OrderController(
+        orderRepo:
+            OrderRepo(sharedPreferences: Get.find(), apiClient: Get.find())));
+
     // Get.lazyPut(() => StatusController());
     // Get.lazyPut(() => InAppCallController(
     //     inAppCallRepo: InAppCallRepo(apiClient: Get.find())));

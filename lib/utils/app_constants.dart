@@ -8,6 +8,8 @@ class AppConstants {
   static const String customerLogin = 'customersettings/customer_login/';
   static const String customerSignup = 'customersettings/customer_signup/';
 
+  static const String orderCreate = 'orders/order/create/';
+
   static const String isSupplier = 'is_supplier';
   static const String notificationChannel = 'channel_type';
   static const String theme = 'lms_theme';

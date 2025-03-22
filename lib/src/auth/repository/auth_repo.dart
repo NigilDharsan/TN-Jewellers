@@ -129,6 +129,14 @@ class AuthRepo {
     return sharedPreferences.getString(AppConstants.refreshToken) ?? "";
   }
 
+  Future<bool?> saveUserToken(String token) async {
+    return await sharedPreferences.setString(AppConstants.token, token);
+  }
+
+  String getUserToken() {
+    return sharedPreferences.getString(AppConstants.token) ?? "";
+  }
+
   bool isLoggedIn() {
     return sharedPreferences.containsKey(AppConstants.token);
   }

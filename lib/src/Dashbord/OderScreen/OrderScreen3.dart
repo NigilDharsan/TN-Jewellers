@@ -42,18 +42,10 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
                   ),
                 ],
               ),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildUploadDocumentSection(),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _buildAudioSection(),
-                  ),
-                ],
-              ),
+              SizedBox(height: 15),
+              _buildUploadDocumentSection(),
+              SizedBox(height: 15),
+              _buildAudioSection(),
               SizedBox(height: 15),
               Row(
                 children: [
