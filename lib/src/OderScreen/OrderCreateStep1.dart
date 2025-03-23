@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:TNJewellers/src/Dashbord/OderScreen/OrderScreen2.dart';
-import 'package:TNJewellers/src/Dashbord/OderScreen/OrderScreen3.dart';
-import 'package:TNJewellers/src/Dashbord/OderScreen/StepIndicator.dart';
-import 'package:TNJewellers/src/Dashbord/OderScreen/controller/OrderController.dart';
+import 'package:TNJewellers/src/OderScreen/OrderCreateStep2.dart';
+import 'package:TNJewellers/src/OderScreen/OrderCreateStep3.dart';
+import 'package:TNJewellers/src/OderScreen/StepIndicator.dart';
+import 'package:TNJewellers/src/OderScreen/controller/OrderController.dart';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:TNJewellers/utils/widgets/custom_text_field.dart';
 import 'package:collection/collection.dart';
@@ -28,8 +28,6 @@ class Orderbasicscreen extends StatefulWidget {
 }
 
 class _OrderbasicscreenState extends State<Orderbasicscreen> {
-  final _formKey = GlobalKey<FormState>();
-
   String? selectedAudioFile;
   String? selectedPhoto;
   String? selectedVideo;
@@ -376,7 +374,10 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
         currentStep = 3;
       });
     } else {
-      await Get.find<OrderController>().orderCreateResponse();
+      final results = await Get.find<OrderController>().orderCreateResponse();
+      if (results) {
+        Get.back();
+      }
     }
   }
 
@@ -462,7 +463,7 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                     child: SingleChildScrollView(
                       padding: EdgeInsets.all(16.0),
                       child: Form(
-                        key: _formKey,
+                        key: controller.formKeyOrder1,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

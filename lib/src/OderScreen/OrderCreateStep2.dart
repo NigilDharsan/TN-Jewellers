@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:TNJewellers/src/Dashbord/OderScreen/controller/OrderController.dart';
+import 'package:TNJewellers/src/OderScreen/controller/OrderController.dart';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:TNJewellers/utils/styles.dart';
 import 'package:flutter/material.dart';

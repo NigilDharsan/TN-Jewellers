@@ -1,5 +1,5 @@
-import 'package:TNJewellers/src/Dashbord/OderScreen/controller/OrderController.dart';
-import 'package:TNJewellers/src/Dashbord/OderScreen/repository/OrderRepo.dart';
+import 'package:TNJewellers/src/OderScreen/controller/OrderController.dart';
+import 'package:TNJewellers/src/OderScreen/repository/OrderRepo.dart';
 import 'package:TNJewellers/src/auth/controller/auth_controller.dart';
 import 'package:TNJewellers/src/auth/repository/auth_repo.dart';
 import 'package:TNJewellers/src/splash/controller/splash_controller.dart';

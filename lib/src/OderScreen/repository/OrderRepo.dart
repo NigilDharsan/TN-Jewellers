@@ -20,4 +20,28 @@ class OrderRepo {
     return await apiClient.postData(AppConstants.orderCreate, body,
         headers: headers);
   }
+
+  Future<Response?> orderList(Map<String, dynamic> body) async {
+    String? accessToken = sharedPreferences.getString(AppConstants.token);
+
+    final headers = {
+      'Accept': '*/*',
+      'Content-Type': 'application/json',
+      'Authorization': 'Token $accessToken'
+    };
+    return await apiClient.postData(AppConstants.orderList, body,
+        headers: headers);
+  }
+
+  Future<Response?> orderDetails(String order_id) async {
+    String? accessToken = sharedPreferences.getString(AppConstants.token);
+
+    final headers = {
+      'Accept': '*/*',
+      'Content-Type': 'application/json',
+      'Authorization': 'Token $accessToken'
+    };
+    return await apiClient.getData(AppConstants.orderDetails + "${order_id}/",
+        headers: headers);
+  }
 }

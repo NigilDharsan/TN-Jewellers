@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:TNJewellers/src/Dashbord/TabScreen.dart';
+import 'package:TNJewellers/src/auth/model/LoginModel.dart';
 import 'package:TNJewellers/src/auth/repository/auth_repo.dart';
 import 'package:TNJewellers/utils/Loader/loader_utils.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +44,9 @@ class AuthController extends GetxController implements GetxService {
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
-  bool isEstablishment = false;
+// Model
+
+  LoginModel? loginModel;
 
   dynamic countryDialCodeForSignup;
 
@@ -71,41 +74,6 @@ class AuthController extends GetxController implements GetxService {
   final newPasswordControllerForChangePasswordScreen = TextEditingController();
   final confirmPasswordControllerForChangePasswordScreen =
       TextEditingController();
-
-  ///TextEditingController for Mark location screen
-  var addressName = TextEditingController();
-  var buildingNumber = TextEditingController();
-  var street = TextEditingController();
-  var pinCode = TextEditingController();
-  var city = TextEditingController();
-  var country = TextEditingController();
-  var landMark = TextEditingController();
-  var latitudeTextController = TextEditingController();
-  var longitudeTextController = TextEditingController();
-  double? Maplattitude;
-  double? MapLongittude;
-  String? placeName;
-
-  ///Driver Address details field
-  var driverbuildingNo = TextEditingController();
-  var driverStreet = TextEditingController();
-  var driverCity = TextEditingController();
-  var driverState = TextEditingController();
-  var driverPincode = TextEditingController();
-  var drivercountry = TextEditingController();
-  var driverlandMark = TextEditingController();
-  bool isNextItineray = true;
-
-  ///Vechile Details
-  var make = TextEditingController();
-  var model = TextEditingController();
-  var trim = TextEditingController();
-  var registrationNumber = TextEditingController();
-  var ownerName = TextEditingController();
-  var ownerAddress = TextEditingController();
-  var ownerPhone = TextEditingController();
-  var storageCapacity = TextEditingController();
-  var dimension = TextEditingController();
 
   ///ADD Account
   var accountNumber = TextEditingController();
@@ -206,6 +174,8 @@ class AuthController extends GetxController implements GetxService {
         email: signInEmailController.value.text,
         password: signInPasswordController.value.text);
     if (response != null && response.statusCode == 200) {
+      loginModel = LoginModel.fromJson(response.body);
+
       print("LOGIN RESPONSE ${response.body}");
       String accessToken = response.body['token'];
       await authRepo.saveUserToken(accessToken);

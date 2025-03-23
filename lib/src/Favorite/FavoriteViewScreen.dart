@@ -1,4 +1,4 @@
-import 'package:TNJewellers/src/Dashbord/OderScreen/OrderbasicScreen.dart';
+import 'package:TNJewellers/Utils/core/helper/route_helper.dart';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:TNJewellers/utils/styles.dart';
 import 'package:flutter/material.dart';
@@ -346,7 +346,7 @@ class _FavoriteViewScreenState extends State<FavoriteViewScreen> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    Get.to(Orderbasicscreen());
+                    Get.toNamed(RouteHelper.orderbasicscreen);
                     setState(() {
                       isOrderNowSelected = true; // Select ORDER NOW
                     });

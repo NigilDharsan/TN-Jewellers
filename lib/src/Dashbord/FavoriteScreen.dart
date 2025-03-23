@@ -1,4 +1,4 @@
-import 'package:TNJewellers/src/Dashbord/Favorite/FavoriteViewScreen.dart';
+import 'package:TNJewellers/src/Favorite/FavoriteViewScreen.dart';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:TNJewellers/utils/images.dart';
 import 'package:TNJewellers/utils/styles.dart';

@@ -9,6 +9,8 @@ class AppConstants {
   static const String customerSignup = 'customersettings/customer_signup/';
 
   static const String orderCreate = 'orders/order/create/';
+  static const String orderList = 'orders/customized_order/list/';
+  static const String orderDetails = 'orders/customized_order/';
 
   static const String isSupplier = 'is_supplier';
   static const String notificationChannel = 'channel_type';

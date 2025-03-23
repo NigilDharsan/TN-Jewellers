@@ -1,11 +1,9 @@
-import 'package:TNJewellers/utils/images.dart';
-import 'package:TNJewellers/utils/styles.dart';
 import 'package:flutter/material.dart';
-import 'DrawerPage.dart';
+
+import '../OderScreen/MyorderScreen.dart';
 import 'CartScreen.dart';
 import 'FavoriteScreen.dart';
 import 'MenuScreen.dart';
-import 'MyorderScreen.dart';
 
 class TabsScreen extends StatefulWidget {
   const TabsScreen({super.key});
@@ -26,7 +24,6 @@ class _TabsScreenState extends State<TabsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: IndexedStack(
         index: _selectedPageIndex,
         children: const [

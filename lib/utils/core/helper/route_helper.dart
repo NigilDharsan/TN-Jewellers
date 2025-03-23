@@ -1,7 +1,6 @@
-import 'package:TNJewellers/src/Dashbord/OderScreen/OrderScreen2.dart';
-import 'package:TNJewellers/src/Dashbord/OderScreen/OrderScreen3.dart';
-import 'package:TNJewellers/src/Dashbord/OderScreen/OrderbasicScreen.dart';
 import 'package:TNJewellers/src/Dashbord/TabScreen.dart';
+import 'package:TNJewellers/src/OderScreen/MyOrderDetailsScreen.dart';
+import 'package:TNJewellers/src/OderScreen/OrderCreateStep1.dart';
 import 'package:TNJewellers/src/auth/signIn/LoginScreen.dart';
 import 'package:TNJewellers/src/auth/signIn/RegisterScreen.dart';
 import 'package:TNJewellers/src/common/update_screen.dart';
@@ -27,8 +26,9 @@ class RouteHelper {
   static const String profilescreen = '/profilescreen';
   static const String orderbasicscreen = '/orderone';
   static const String ordertwoscreen = '/ordertwo';
-
   static const String orderthreescreen = '/orderthree';
+
+  static const String orderdetailscreen = '/orderdetailscreen';
 
   static const String riderhistoryscreen = '/riderhistoryscreen';
   static const String ridecompletedetails = '/ridecompletedetails';
@@ -50,6 +50,7 @@ class RouteHelper {
   static String getOrderbasicscreenRoute() => orderbasicscreen;
   static String getOrderScreenTwoRoute() => ordertwoscreen;
   static String getOrderScreenThreeRoute() => orderthreescreen;
+  static String getOrderDetailRoute() => orderdetailscreen;
 
   static String getRiderHistoryRoute() => riderhistoryscreen;
   static String getRideCompleteDetailsRoute() => ridecompletedetails;
@@ -68,8 +69,8 @@ class RouteHelper {
     GetPage(name: dashboardscreen, page: () => getRoute(TabsScreen())),
 
     GetPage(name: orderbasicscreen, page: () => getRoute(Orderbasicscreen())),
-    GetPage(name: ordertwoscreen, page: () => getRoute(OrderScreenTwo())),
-    GetPage(name: orderthreescreen, page: () => getRoute(OrderScreenThree())),
+    GetPage(
+        name: orderdetailscreen, page: () => getRoute(MyOrderDetailsScreen())),
 
     // GetPage(
     //     name: addLocation,

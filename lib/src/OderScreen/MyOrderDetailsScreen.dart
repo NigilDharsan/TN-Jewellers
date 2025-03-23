@@ -1,16 +1,16 @@
-import 'package:TNJewellers/src/Dashbord/OderScreen/controller/OrderController.dart';
+import 'package:TNJewellers/src/OderScreen/controller/OrderController.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class OrderScreenThree extends StatefulWidget {
-  const OrderScreenThree({super.key});
+class MyOrderDetailsScreen extends StatefulWidget {
+  const MyOrderDetailsScreen({super.key});
 
   @override
-  State<OrderScreenThree> createState() => _OrderScreenThreeState();
+  State<MyOrderDetailsScreen> createState() => _MyOrderDetailsScreeneState();
 }
 
-class _OrderScreenThreeState extends State<OrderScreenThree> {
+class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
   String? audioFile;
   int currentStep = 3;
 
@@ -26,14 +26,22 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<OrderController>(builder: (controller) {
-      return _buildBody(controller);
-    });
+    return GetBuilder<OrderController>(
+        initState: (state) =>
+            Get.find<OrderController>().getOrderDetailsResponse(),
+        builder: (controller) {
+          return _buildBody(controller);
+        });
   }
 
   Widget _buildBody(OrderController controller) {
-    return Expanded(
-      child: SingleChildScrollView(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 1,
+        title: Text("ORDER DETAILS"),
+      ),
+      body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Column(
