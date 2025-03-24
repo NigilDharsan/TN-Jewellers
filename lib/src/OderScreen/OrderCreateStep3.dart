@@ -1,4 +1,5 @@
 import 'package:TNJewellers/src/OderScreen/controller/OrderController.dart';
+import 'package:TNJewellers/utils/styles.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -124,12 +125,12 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: order_style,
         ),
         SizedBox(height: 5),
         Text(
           value,
-          style: TextStyle(fontSize: 16),
+          style: order_style2,
         ),
       ],
     );
@@ -158,13 +159,13 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Upload Document',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            style: order_style),
         SizedBox(height: 5),
         Row(
           children: [
             Icon(Icons.photo, color: Colors.blue),
             SizedBox(width: 5),
-            Text('photo.01.jpg'),
+            Text('photo.01.jpg',style: order_style2,),
             Icon(Icons.download, color: Colors.blue),
             Icon(Icons.remove_red_eye, color: Colors.grey),
           ],
@@ -179,13 +180,13 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Audio File',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            style: order_style),
         SizedBox(height: 5),
         Container(
           child: Row(
             children: [
               Icon(Icons.audiotrack, color: Colors.green),
-              Text('audio.01.mp3'),
+              Text('audio.01.mp3',style: order_style2,),
               Icon(Icons.download, color: Colors.blue),
               Icon(Icons.play_arrow, color: Colors.red),
             ],

@@ -146,7 +146,6 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
               padding: const EdgeInsets.all(10.0),
               child: SizedBox(
                 height: (4 / 2) * 170,
-                // Adjusts height to 40% of screen height
                 child: GridView.builder(
                   physics: NeverScrollableScrollPhysics(),
                   itemCount: 4,

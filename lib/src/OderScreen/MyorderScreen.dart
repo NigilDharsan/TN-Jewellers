@@ -4,7 +4,6 @@ import 'package:TNJewellers/utils/core/helper/route_helper.dart';
 import 'package:TNJewellers/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../../utils/colors.dart';
 import '../../utils/images.dart';
 
@@ -18,7 +17,7 @@ class MyOrderScreen extends StatefulWidget {
 class _MyOrderScreenState extends State<MyOrderScreen> {
   String selectedValue = "MOST RECENT"; // Initial value
 
-  bool isGridView = true;
+  bool isListView = true;
   final List<String> mydream = [
     "EAR RINGS",
     "GOLD",
@@ -99,7 +98,6 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
           ),
         ),
 
-        // 🔽 Dropdown & Grid/List Toggle
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           child: Row(
@@ -125,7 +123,8 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
                         selectedValue = newValue!;
                       });
                     },
-                    underline: SizedBox(), // Removes default underline
+                    underline: SizedBox(),
+                    // Removes default underline
                     icon: Icon(Icons.arrow_drop_down),
                     style: TextStyle(color: Colors.black),
                   ),
@@ -133,10 +132,11 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
               ),
               SizedBox(width: 10),
               IconButton(
-                icon: Icon(isGridView ? Icons.list : Icons.grid_view, size: 28),
+                icon: Icon(isListView ? Icons.list : Icons.grid_view, size: 28),
                 onPressed: () {
                   setState(() {
-                    isGridView = !isGridView;
+                    isListView =
+                        !isListView; // ✅ Toggle between ListView and GridView
                   });
                 },
               ),
@@ -145,26 +145,25 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
         ),
 
         Expanded(
-          child: isGridView
-              ? GridView.builder(
-                  padding: EdgeInsets.all(10),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    childAspectRatio: 0.95,
-                  ),
-                  itemCount: controller.orderListModel?.data?.length,
-                  itemBuilder: (context, index) => buildProductGrid(
-                      controller.orderListModel!.data![index], controller),
-                )
-              : ListView.builder(
-                  padding: EdgeInsets.all(10),
-                  itemCount: controller.orderListModel?.data?.length,
-                  itemBuilder: (context, index) => buildProductCard(
-                      controller.orderListModel!.data![index], controller),
-                ),
-        ),
+            child: isListView
+                ? ListView.builder(
+                    padding: EdgeInsets.all(10),
+                    itemCount: controller.orderListModel?.data?.length,
+                    itemBuilder: (context, index) => buildProductCard(
+                        controller.orderListModel!.data![index], controller),
+                  )
+                : GridView.builder(
+                    padding: EdgeInsets.all(10),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: 0.95,
+                    ),
+                    itemCount: controller.orderListModel?.data?.length,
+                    itemBuilder: (context, index) => buildProductGrid(
+                        controller.orderListModel!.data![index], controller),
+                  )),
       ],
     );
   }
@@ -244,7 +243,6 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
     );
   }
 
-// List View Item
   Widget buildProductCard(OrderListData product, OrderController controller) {
     return InkWell(
       onTap: () {
@@ -272,34 +270,60 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(Icons.notifications, color: Colors.blue, size: 24),
-                Icon(Icons.arrow_forward, color: Colors.grey),
-              ],
-            ),
-            SizedBox(height: 10),
-
-            // ✅ Null-safe access
-            Text(
-              product.productName ?? "Product Name",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            SizedBox(height: 8),
-
-            Row(
-              children: [
-                Expanded(child: Text(product.customerDueDate ?? "No Due Date")),
-                SizedBox(width: 10),
-                Expanded(child: Text(product.status ?? "Status")),
+                Icon(Icons.notifications, color: brandPrimaryColor, size: 24),
+                Expanded(
+                  child: Text(
+                    product.productName ?? "Product Name",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: brandPrimaryColor),
+                  ),
+                ),
+                Icon(Icons.arrow_circle_right_outlined,
+                    color: brandPrimaryColor),
               ],
             ),
             SizedBox(height: 8),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(child: Text("Weight: ${product.weight ?? "N/A"}")),
-                SizedBox(width: 10),
-                Expanded(child: Text("pieces: ${product.pieces ?? "N/A"}")),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Customer Name", style: order_normal),
+                    Text(product.customerNickName ?? "N/A", style: order_bold),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Weight", style: order_normal),
+                    Text(product.weight ?? "N/A", style: order_bold),
+                  ],
+                ),
               ],
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Delivery Date", style: order_normal),
+                    Text(product.customerDueDate ?? "No Due Date",
+                        style: order_bold),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Other Status", style: order_normal),
+                    Text(product.status ?? "Status", style: order_bold),
+                  ],
+                ),
+              ],
+            )
           ],
         ),
       ),

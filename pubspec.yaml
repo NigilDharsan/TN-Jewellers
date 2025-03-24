@@ -61,6 +61,10 @@ dependencies:
   flutter_sound:
   video_player:
 
+  audioplayers:
+
+
+
   geolocator:
   url_launcher:
   pin_code_fields:

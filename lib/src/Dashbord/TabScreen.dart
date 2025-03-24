@@ -1,5 +1,7 @@
+import 'package:TNJewellers/Utils/core/helper/route_helper.dart';
+import 'package:TNJewellers/utils/colors.dart';
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart';
 import '../OderScreen/MyorderScreen.dart';
 import 'CartScreen.dart';
 import 'FavoriteScreen.dart';
@@ -13,7 +15,15 @@ class TabsScreen extends StatefulWidget {
 }
 
 class _TabsScreenState extends State<TabsScreen> {
+
+  bool isOrderNowSelected = true; // Default: ORDER NOW is selected
   int _selectedPageIndex = 0;
+  final List<Widget> _screens = [
+    MenuScreen(),
+    MyOrderScreen(),
+    FavoriteScreen(),
+    CartScreen(),
+  ];
 
   void _selectPage(int index) {
     setState(() {
@@ -21,22 +31,31 @@ class _TabsScreenState extends State<TabsScreen> {
     });
   }
 
+  void _openAddNewPage() {
+    setState(() {
+      isOrderNowSelected = true; // Select ORDER NOW
+    });
+    Get.toNamed(RouteHelper.orderbasicscreen);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
         index: _selectedPageIndex,
-        children: const [
-          MenuScreen(),
-          MyOrderScreen(),
-          FavoriteScreen(),
-          CartScreen(),
-        ],
+        children: _screens,
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openAddNewPage,
+        backgroundColor: brandPrimaryColor,
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add, size: 30, color: Colors.white),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomNavigationBar(
         onTap: _selectPage,
         currentIndex: _selectedPageIndex,
-        selectedItemColor: Colors.orange,
+        selectedItemColor: brandPrimaryColor,
         unselectedItemColor: Colors.brown,
         type: BottomNavigationBarType.fixed,
         items: const [

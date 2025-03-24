@@ -179,7 +179,6 @@ class AuthController extends GetxController implements GetxService {
       print("LOGIN RESPONSE ${response.body}");
       String accessToken = response.body['token'];
       await authRepo.saveUserToken(accessToken);
-
       signInEmailController.clear();
       signInPasswordController.clear();
       Get.offAll(TabsScreen()); // Perform login action

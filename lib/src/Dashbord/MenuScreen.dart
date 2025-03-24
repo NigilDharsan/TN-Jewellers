@@ -48,24 +48,24 @@ class _MenuScreenState extends State<MenuScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        // Set background color
         elevation: 0,
-        // Remove shadow
         iconTheme: IconThemeData(color: Colors.black),
-        // Drawer icon color
         toolbarHeight: 100,
-        // Set AppBar height
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Welcome',
-                    style: JosefinSansRegular, textScaleFactor: 0.8),
+                Text(
+                  'Welcome',
+                  style: order_style2
+                ),
                 SizedBox(height: 3), // Reduce spacing for small height
-                Text('TN JEWELLERS',
-                    style: JosefinSansBold, textScaleFactor: 0.8),
+                Text(
+                  'TN JEWELLERY',
+                  style: jewellery_style
+                ),
               ],
             ),
             Image.asset(
@@ -95,7 +95,7 @@ class _MenuScreenState extends State<MenuScreen> {
                           child: TextField(
                             decoration: InputDecoration(
                               suffixIcon: Image.asset(Images.search),
-                              hintText: 'Search...',
+                              hintText: 'Search Bar',
                               hintStyle: TextStyle(color: brandGreyColor),
                               // Set the hint text color
                               border: OutlineInputBorder(
@@ -263,7 +263,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                   'Stock the Best!')
                               : index == 2
                                   ? GridViewCartDesign(
-                                      brandPrimaryColor,
+                                      brandGoldColor,
                                       'NEW ARRIVALS.\nTRENDING.\nEXCLUSIVE.',
                                       Icons.shopping_cart,
                                       'Browse Now',

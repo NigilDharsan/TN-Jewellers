@@ -16,6 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -40,9 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     _buildTextField(
                         'Enter your text here',
                         'LOGIN/USER NAME/EMAIL',
-                        controller.signInEmailController,
-                        false,
-                        controller),
+                        controller.signInEmailController, false, controller),
                     const SizedBox(height: 20),
                     _buildTextField('Enter your text here', 'PASSWORD',
                         controller.signInPasswordController, true, controller),

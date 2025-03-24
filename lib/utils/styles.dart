@@ -128,6 +128,55 @@ TextStyle favorite_title = TextStyle(
   fontWeight: FontWeight.w600,
 );
 
+TextStyle order_style2 = TextStyle(
+  fontFamily: 'JosefinSans',
+  fontSize: 16,
+  color: brandGreyColor,
+  fontWeight: FontWeight.bold,
+);
+TextStyle order_style3 = TextStyle(
+  fontFamily: 'JosefinSans',
+  fontSize: 20,
+  color: brandPrimaryColor,
+  fontWeight: FontWeight.bold,
+);
+
+TextStyle order_container = TextStyle(
+  fontFamily: 'JosefinSans',
+  fontSize: 16,
+  color: secondaryColor,
+  fontWeight: FontWeight.bold,
+);
+
+TextStyle order_style = TextStyle(
+  fontFamily: 'JosefinSans',
+  fontSize: 13,
+  color: brandGreySoftColor,
+  fontWeight: FontWeight.bold,
+);
+
+TextStyle order_normal = TextStyle(
+  fontFamily: 'JosefinSans',
+  fontSize: 13,
+  color: brandGreySoftColor,
+  fontWeight: FontWeight.w500,
+);
+TextStyle order_bold = TextStyle(
+  fontFamily: 'JosefinSans',
+  fontSize: 14,
+  color: textColor,
+  fontWeight: FontWeight.w700,
+);
+
+
+
+
+TextStyle jewellery_style = TextStyle(
+  fontFamily: 'JosefinSans',
+  fontSize: 16,
+  color: brandGoldColor,
+  fontWeight: FontWeight.bold,
+);
 TextStyle favorite_Subtitle = TextStyle(
   fontFamily: 'JosefinSans',
   fontSize: 10,

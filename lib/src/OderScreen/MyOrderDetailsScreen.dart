@@ -1,7 +1,10 @@
 import 'package:TNJewellers/src/OderScreen/controller/OrderController.dart';
+import 'package:TNJewellers/utils/colors.dart';
+import 'package:TNJewellers/utils/styles.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:path/path.dart';
 
 class MyOrderDetailsScreen extends StatefulWidget {
   const MyOrderDetailsScreen({super.key});
@@ -47,6 +50,32 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _buildRingValue(
+                  '', controller.orderDetailsModel!.data?.productName ?? ""),
+              SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildcontainerValue(
+                        'Status',
+                        controller.orderDetailsModel!.data?.customerNickName ??
+                            ""),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildTextWithValue(
+                        'Delivery Date',
+                        controller.orderDetailsModel!.data?.expDeliveryDate ??
+                            ""),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildTextWithValue('Pick-up by',
+                        controller.orderDetailsModel!.data?.orderNo ?? ""),
+                  ),
+                ],
+              ),
+              SizedBox(height: 15),
               Row(
                 children: [
                   Expanded(
@@ -67,6 +96,18 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
               SizedBox(height: 15),
               _buildAudioSection(),
               SizedBox(height: 15),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTextWithValue('Description',
+                        controller.orderDetailsModel!.data?.remarks ?? ""),
+                  ),
+                  Expanded(
+                    child: _buildTextWithValue('Expected Delivery Date',
+                        controller.orderDetailsModel!.data?.expDeliveryDate ?? ""),
+                  ),
+                ],
+              ),
               Row(
                 children: [
                   Expanded(
@@ -113,18 +154,6 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
                 ],
               ),
               SizedBox(height: 15),
-              _buildTextWithValue('Expected Delivery Date',
-                  controller.orderDetailsModel!.data?.expDeliveryDate ?? ""),
-              SizedBox(height: 15),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildTextWithValue('Description',
-                        controller.orderDetailsModel!.data?.remarks ?? ""),
-                  ),
-                ],
-              ),
-              SizedBox(height: 15),
             ],
           ),
         ),
@@ -139,12 +168,47 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: order_style,
         ),
         SizedBox(height: 5),
         Text(
           value,
-          style: TextStyle(fontSize: 16),
+          style: order_style2,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildcontainerValue(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: order_style,
+        ),
+        SizedBox(height: 10),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 5),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(3), color: Colors.green),
+          child: Text(
+            value,
+            style: order_container,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRingValue(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          value,
+          style: order_style3,
         ),
       ],
     );
@@ -172,16 +236,17 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Upload Document',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text('Upload Document', style: order_style),
         SizedBox(height: 5),
         Row(
           children: [
-            Icon(Icons.photo, color: Colors.blue),
+            Icon(Icons.photo, color: brandGreyColor),
             SizedBox(width: 5),
-            Text('photo.01.jpg'),
-            Icon(Icons.download, color: Colors.blue),
-            Icon(Icons.remove_red_eye, color: Colors.grey),
+            Text('photo.01.jpg', style: order_style2),
+            SizedBox(width: 5),
+            Icon(Icons.download, color: brandGreyColor),
+            SizedBox(width: 5),
+            Icon(Icons.remove_red_eye, color: brandGreyColor),
           ],
         ),
       ],
@@ -193,16 +258,21 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Audio File',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text('Audio File', style: order_style),
         SizedBox(height: 5),
         Container(
           child: Row(
             children: [
-              Icon(Icons.audiotrack, color: Colors.green),
-              Text('audio.01.mp3'),
-              Icon(Icons.download, color: Colors.blue),
-              Icon(Icons.play_arrow, color: Colors.red),
+              Icon(Icons.volume_up_rounded, color: brandGreyColor),
+              SizedBox(width: 5),
+              Text(
+                'audio.01.mp4',
+                style: order_style2,
+              ),
+              SizedBox(width: 5),
+              Icon(Icons.download, color: brandGreyColor),
+              SizedBox(width: 5),
+              Icon(Icons.play_arrow, color: brandGreyColor),
             ],
           ),
         ),

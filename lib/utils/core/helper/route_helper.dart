@@ -67,10 +67,8 @@ class RouteHelper {
     GetPage(name: onBoardScreen, page: () => getRoute(const LoginScreen())),
     GetPage(name: register, page: () => getRoute(RegisterScreen())),
     GetPage(name: dashboardscreen, page: () => getRoute(TabsScreen())),
-
     GetPage(name: orderbasicscreen, page: () => getRoute(Orderbasicscreen())),
-    GetPage(
-        name: orderdetailscreen, page: () => getRoute(MyOrderDetailsScreen())),
+    GetPage(name: orderdetailscreen, page: () => getRoute(MyOrderDetailsScreen())),
 
     // GetPage(
     //     name: addLocation,
