@@ -66,7 +66,7 @@ class SplashScreenState extends State<SplashScreen> {
     // Get.find<SplashController>().getConfigData().then((value) {
     Timer(const Duration(seconds: 2), () async {
       if (Get.find<AuthController>().isLoggedIn()) {
-        Get.offAllNamed(RouteHelper.getDashBoardRoute());
+        Get.offAllNamed(RouteHelper.getSignInRoute());
         SingleTon().LoginType == 'supplier';
       } else {
         Get.toNamed(RouteHelper.getSignInRoute());

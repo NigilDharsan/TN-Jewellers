@@ -1,3 +1,5 @@
+import 'package:TNJewellers/src/OderScreen/model/OrderDetailsModel.dart';
+import 'package:TNJewellers/src/OderScreen/model/OrderListModel.dart';
 import 'package:TNJewellers/src/OderScreen/repository/OrderRepo.dart';
 import 'package:TNJewellers/src/auth/controller/auth_controller.dart';
 import 'package:TNJewellers/utils/Loader/loader_utils.dart';
@@ -10,11 +12,17 @@ class OrderController extends GetxController implements GetxService {
 
   OrderController({required this.orderRepo});
 
+  OrderListModel? orderListModel;
+  OrderDetailsModel? orderDetailsModel;
+
   final formKeyOrder1 = GlobalKey<FormState>();
   final formKeyOrder2 = GlobalKey<FormState>();
 
   var screenType = "orderone".obs; // Observable variable
   bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
+  String selectedProductID = "";
 
   final TextEditingController firstnameController = TextEditingController();
   final TextEditingController invoiceController = TextEditingController();
@@ -99,6 +107,8 @@ class OrderController extends GetxController implements GetxService {
     };
     Response? response = await orderRepo.orderList(body);
     if (response != null && response.statusCode == 200) {
+      orderListModel = OrderListModel.fromJson(response.body);
+
       print("LOGIN RESPONSE ${response.body}");
 
       _isLoading = false;
@@ -120,6 +130,8 @@ class OrderController extends GetxController implements GetxService {
 
     Response? response = await orderRepo.orderDetails("29");
     if (response != null && response.statusCode == 200) {
+      orderDetailsModel = OrderDetailsModel.fromJson(response.body);
+
       print("LOGIN RESPONSE ${response.body}");
 
       _isLoading = false;

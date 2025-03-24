@@ -1,4 +1,5 @@
 import 'package:TNJewellers/src/OderScreen/controller/OrderController.dart';
+import 'package:TNJewellers/src/OderScreen/model/OrderListModel.dart';
 import 'package:TNJewellers/utils/core/helper/route_helper.dart';
 import 'package:TNJewellers/utils/styles.dart';
 import 'package:flutter/material.dart';
@@ -16,16 +17,6 @@ class MyOrderScreen extends StatefulWidget {
 
 class _MyOrderScreenState extends State<MyOrderScreen> {
   String selectedValue = "MOST RECENT"; // Initial value
-
-  List<Map<String, String>> products = List.generate(
-    8,
-    (index) => {
-      "name": "NIKIL",
-      "weight": "12 GRAMS",
-      "delivery": "Delivery Date: 12-03-2025",
-      "order": "Order Status: IN PROGRESS",
-    },
-  );
 
   bool isGridView = true;
   final List<String> mydream = [
@@ -57,6 +48,9 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
             initState: (state) =>
                 Get.find<OrderController>().getOrderListResponse(),
             builder: (controller) {
+              if (controller.isLoading && controller.orderListModel == null) {
+                return Center(child: CircularProgressIndicator());
+              }
               return _buildBody(controller);
             }));
   }
@@ -160,15 +154,15 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
                     mainAxisSpacing: 10,
                     childAspectRatio: 0.95,
                   ),
-                  itemCount: products.length,
-                  itemBuilder: (context, index) =>
-                      buildProductGrid(products[index]),
+                  itemCount: controller.orderListModel?.data?.length,
+                  itemBuilder: (context, index) => buildProductGrid(
+                      controller.orderListModel!.data![index], controller),
                 )
               : ListView.builder(
                   padding: EdgeInsets.all(10),
-                  itemCount: products.length,
-                  itemBuilder: (context, index) =>
-                      buildProductCard(products[index]),
+                  itemCount: controller.orderListModel?.data?.length,
+                  itemBuilder: (context, index) => buildProductCard(
+                      controller.orderListModel!.data![index], controller),
                 ),
         ),
       ],
@@ -200,9 +194,10 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
   }
 
 // Grid View Item
-  Widget buildProductGrid(Map<String, String> product) {
+  Widget buildProductGrid(OrderListData product, OrderController controller) {
     return InkWell(
       onTap: () {
+        controller.selectedProductID = product.pkId.toString();
         Get.toNamed(RouteHelper.orderdetailscreen);
       },
       child: Container(
@@ -231,15 +226,13 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
             ),
             SizedBox(height: 10),
             Text(
-              product["name"] ?? "Unknown",
+              product.productName ?? "Product Name",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 5),
-            Text(product["delivery"] ?? "No Delivery Info",
-                textAlign: TextAlign.center),
-            Text(product["order"] ?? "No Order Status",
-                textAlign: TextAlign.center),
+            Text(product.customerDueDate ?? "", textAlign: TextAlign.center),
+            Text(product.status ?? "", textAlign: TextAlign.center),
             SizedBox(height: 5),
             Align(
               alignment: Alignment.centerRight,
@@ -252,9 +245,10 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
   }
 
 // List View Item
-  Widget buildProductCard(Map<String, String> product) {
+  Widget buildProductCard(OrderListData product, OrderController controller) {
     return InkWell(
       onTap: () {
+        controller.selectedProductID = product.pkId.toString();
         Get.toNamed(RouteHelper.orderdetailscreen);
       },
       child: Container(
@@ -286,25 +280,24 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
 
             // ✅ Null-safe access
             Text(
-              product["name"] ?? "NIKIL",
+              product.productName ?? "Product Name",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             SizedBox(height: 8),
 
             Row(
               children: [
-                Expanded(
-                    child: Text(product["delivery"] ?? "No Delivery Info")),
+                Expanded(child: Text(product.customerDueDate ?? "No Due Date")),
                 SizedBox(width: 10),
-                Expanded(child: Text(product["order"] ?? "No Order Status")),
+                Expanded(child: Text(product.status ?? "Status")),
               ],
             ),
             SizedBox(height: 8),
             Row(
               children: [
-                Expanded(child: Text("Weight: ${product["weight"] ?? "N/A"}")),
+                Expanded(child: Text("Weight: ${product.weight ?? "N/A"}")),
                 SizedBox(width: 10),
-                Expanded(child: Text("Weight: ${product["weight"] ?? "N/A"}")),
+                Expanded(child: Text("pieces: ${product.pieces ?? "N/A"}")),
               ],
             ),
           ],

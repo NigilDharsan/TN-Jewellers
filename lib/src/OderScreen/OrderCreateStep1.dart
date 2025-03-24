@@ -546,7 +546,7 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                               playbackProgress: _playbackProgress,
                             ),
                             _buildDescriptionContainer(
-                              'Description', // Label outside
+                              'Description *', // Label outside
                               'Some text description change the customer looking for retailers',
                               // Hint inside the box
                               controller.descriptionController,

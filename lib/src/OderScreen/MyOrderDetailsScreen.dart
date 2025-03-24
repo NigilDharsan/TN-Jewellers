@@ -51,12 +51,14 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
                 children: [
                   Expanded(
                     child: _buildTextWithValue(
-                        'Customer Name', controller.firstnameController.text),
+                        'Customer Name',
+                        controller.orderDetailsModel!.data?.customerNickName ??
+                            ""),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildTextWithValue(
-                        'Invoice Number', controller.invoiceController.text),
+                    child: _buildTextWithValue('Invoice Number',
+                        controller.orderDetailsModel!.data?.orderNo ?? ""),
                   ),
                 ],
               ),
@@ -68,13 +70,13 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildTextWithValue(
-                        'Product Type', controller.productTypeController.text),
+                    child: _buildTextWithValue('Product Type',
+                        controller.orderDetailsModel!.data?.orderType ?? ""),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildTextWithValue(
-                        'Design', controller.designController.text),
+                    child: _buildTextWithValue('Design',
+                        controller.orderDetailsModel!.data?.designName ?? ""),
                   ),
                 ],
               ),
@@ -83,7 +85,9 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
                 children: [
                   Expanded(
                     child: _buildTextWithValue(
-                        'Required Weight', controller.weightController.text),
+                        'Required Weight',
+                        controller.orderDetailsModel!.data?.reqWt.toString() ??
+                            ""),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -95,25 +99,28 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildTextWithValue(
-                        'Stone', controller.stoneController.text),
+                    child: _buildTextWithValue('Stone',
+                        controller.orderDetailsModel!.data?.stoneName ?? ""),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: _buildTextWithValue(
-                        'Stone Weight', controller.stoneWeightController.text),
+                        'Stone Weight',
+                        controller.orderDetailsModel!.data?.stoneWt
+                                .toString() ??
+                            ""),
                   ),
                 ],
               ),
               SizedBox(height: 15),
               _buildTextWithValue('Expected Delivery Date',
-                  controller.deliveryDateController.text),
+                  controller.orderDetailsModel!.data?.expDeliveryDate ?? ""),
               SizedBox(height: 15),
               Row(
                 children: [
                   Expanded(
-                    child: _buildTextWithValue(
-                        'Description', controller.descriptionController.text),
+                    child: _buildTextWithValue('Description',
+                        controller.orderDetailsModel!.data?.remarks ?? ""),
                   ),
                 ],
               ),
