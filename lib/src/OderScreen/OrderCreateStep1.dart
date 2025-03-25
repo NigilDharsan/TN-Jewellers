@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:TNJewellers/src/OderScreen/OrderCreateStep2.dart';
 import 'package:TNJewellers/src/OderScreen/OrderCreateStep3.dart';
 import 'package:TNJewellers/src/OderScreen/StepIndicator.dart';
@@ -43,7 +44,6 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
   Duration? _selectedDuration;
   List<Map<String, dynamic>> selectedFiles = [];
   final ImagePicker _imagePicker = ImagePicker();
-  List<String> photoPaths = [];
   List<String> videoPaths = [];
   List<VideoPlayerController> videoControllers = [];
   final ImagePicker picker = ImagePicker();
@@ -119,7 +119,6 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
     }
   }
 
-
   Future<void> _stopRecording() async {
     if (!_isRecording) return;
     await _recorder.stop();
@@ -191,19 +190,14 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
     });
   }
 
-
   void _downloadRecording(String filePath) {
     print("Downloading: $filePath");
   }
-
-
-
 
   Future<void> _saveMedia() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('selectedFiles', json.encode(selectedFiles));
   }
-
 
   Future<void> pickMultipleImages() async {
     List<XFile>? images = await picker.pickMultiImage();
@@ -215,7 +209,7 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
         });
       }
     });
-      _saveMedia();
+    _saveMedia();
   }
 
   Future<void> capturePhoto() async {
@@ -330,23 +324,42 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
     );
   }
 
-
   Future<void> nextStep() async {
     // await Get.find<OrderController>().orderCreateResponse();
 
     if (Get.find<OrderController>().screenType.value == "orderone") {
-      Get.find<OrderController>().screenType.value = "ordertwo";
-      setState(() {
-        currentStep = 2;
-      });
+      if (Get.find<OrderController>().formKeyOrder1.currentState!.validate()) {
+        // if (selectedFiles.isEmpty) {
+        //   Get.snackbar("Error", "Please upload at least one photo or video",
+        //       backgroundColor: Colors.red, colorText: Colors.white);
+        //   return;
+        // } else if (_recordedFiles.isEmpty) {
+        //   Get.snackbar("Error", "Please record at least one audio file",
+        //       backgroundColor: Colors.red, colorText: Colors.white);
+        //   return;
+        // } else {
+        Get.find<OrderController>().selectedFiles = selectedFiles;
+        Get.find<OrderController>().recordedFiles = _recordedFiles;
+        Get.find<OrderController>().screenType.value = "ordertwo";
+        setState(() {
+          currentStep = 2;
+        });
+        // }
+      } else {
+        return;
+      }
     } else if (Get.find<OrderController>().screenType.value == "ordertwo") {
-      Get.find<OrderController>().screenType.value = "orderthree";
-      setState(() {
-        currentStep = 3;
-      });
+      if (Get.find<OrderController>().formKeyOrder2.currentState!.validate()) {
+        Get.find<OrderController>().screenType.value = "orderthree";
+        setState(() {
+          currentStep = 3;
+        });
+      }
     } else {
       final results = await Get.find<OrderController>().orderCreateResponse();
       if (results) {
+        Navigator.pop(context); // Close the dialog
+
         Get.back();
       }
     }
@@ -369,7 +382,7 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
             ),
             TextButton(
               onPressed: () {
-                // controller.clearData(); // Clear form or data
+                controller.clearCreateDate(); // Clear form or data
                 Navigator.pop(context); // Close the dialog
                 Get.back();
               },
@@ -469,7 +482,7 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                                   child: buildAttachmentSection(
                                     label: "Take a Camera\nPhoto",
                                     icon: Icons.camera_alt_outlined,
-                                    onPick: () =>_showUploadMediaOptions(),
+                                    onPick: () => _showUploadMediaOptions(),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
@@ -482,7 +495,7 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                                 ),
                               ],
                             ),
-                              const SizedBox(height: 10),
+                            const SizedBox(height: 10),
                             if (selectedFiles.isNotEmpty)
                               SizedBox(
                                 height: 100,
@@ -491,7 +504,7 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                                   scrollDirection: Axis.horizontal,
                                   children: List.generate(
                                     selectedFiles.length,
-                                        (index) {
+                                    (index) {
                                       return buildMediaItem(
                                         selectedFiles[index]['path'],
                                         selectedFiles[index]['type'] == 'video',
@@ -501,15 +514,15 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                                   ),
                                 ),
                               ),
-                             const SizedBox(height: 20),
-                              Text(
-                                "RECORD/ATTACH AUDIO *",
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: brandGreyColor,
-                                ),
+                            const SizedBox(height: 20),
+                            Text(
+                              "RECORD/ATTACH AUDIO *",
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: brandGreyColor,
                               ),
+                            ),
                             const SizedBox(height: 20),
                             buildAudioAttachment(
                               isRecording: _isRecording,
@@ -624,40 +637,44 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
             borderRadius: BorderRadius.circular(10),
           ),
           child: isVideo
-              ? (videoControllers.length > index && videoControllers[index].value.isInitialized)
-              ? GestureDetector(
-            onTap: () {
-              setState(() {
-                if (videoControllers[index].value.isPlaying) {
-                  videoControllers[index].pause();
-                } else {
-                  videoControllers[index].play();
-                }
-              });
-            },
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                AspectRatio(
-                  aspectRatio: videoControllers[index].value.aspectRatio,
-                  child: VideoPlayer(videoControllers[index]),
-                ),
-                if (!videoControllers[index].value.isPlaying)
-                  const Icon(Icons.play_circle_fill, color: Colors.white, size: 40),
-              ],
-            ),
-          )
-              : const Center(child: CircularProgressIndicator())
+              ? (videoControllers.length > index &&
+                      videoControllers[index].value.isInitialized)
+                  ? GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          if (videoControllers[index].value.isPlaying) {
+                            videoControllers[index].pause();
+                          } else {
+                            videoControllers[index].play();
+                          }
+                        });
+                      },
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          AspectRatio(
+                            aspectRatio:
+                                videoControllers[index].value.aspectRatio,
+                            child: VideoPlayer(videoControllers[index]),
+                          ),
+                          if (!videoControllers[index].value.isPlaying)
+                            const Icon(Icons.play_circle_fill,
+                                color: Colors.white, size: 40),
+                        ],
+                      ),
+                    )
+                  : const Center(child: CircularProgressIndicator())
               : ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.file(File(path), fit: BoxFit.cover),
-          ),
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.file(File(path), fit: BoxFit.cover),
+                ),
         ),
         Positioned(
           top: 0,
           right: 1,
           child: IconButton(
-            icon: const Icon(Icons.cancel_outlined, color: Colors.red, size: 30),
+            icon:
+                const Icon(Icons.cancel_outlined, color: Colors.red, size: 30),
             onPressed: () => _clearSingleMedia(index),
           ),
         ),
@@ -708,6 +725,10 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                 borderSide: BorderSide.none,
               ),
             ),
+            validator: (value) {
+              if ((value == null || value.isEmpty))
+                return "Please enter description";
+            },
           ),
         ),
       ],
@@ -768,84 +789,86 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
             itemCount: recordedFiles.length,
             itemBuilder: (context, index) {
               String filePath = recordedFiles[index];
-              bool isCurrentPlaying = _isPlaying && _currentFilePath == filePath;
+              bool isCurrentPlaying =
+                  _isPlaying && _currentFilePath == filePath;
               return Row(
-                   mainAxisSize: MainAxisSize.min,
-                   children: [
-                     IconButton(
-                       icon: Icon(
-                         isCurrentPlaying ? Icons.volume_up_rounded : Icons.volume_mute,
-                         color: brandGreyColor,
-                       ),
-                       onPressed: () {
-                         if (isCurrentPlaying) {
-                           _stopPlayback();
-                         } else {
-                           _playSegment(filePath);
-                         }
-                       },
-                     ),
-                      Text(
-                       filePath.split('/').last,
-                       overflow: TextOverflow.ellipsis,
-                     ),
-                     IconButton(
-                       icon: const Icon(Icons.download, color: brandGreyColor),
-                       onPressed: () => onDownload(filePath),
-                     ),
-                     IconButton(
-                       icon: Icon(
-                         isCurrentPlaying ? Icons.stop : Icons.play_arrow,
-                         color: brandGreyColor,
-                       ),
-                       onPressed: () {
-                         if (isCurrentPlaying) {
-                           _stopPlayback();
-                         } else {
-                           _playSegment(filePath);
-                         }
-                       },
-                     ),
-                     SizedBox(
-                       width: 100, // Fixed width to prevent shifting
-                       child: Stack(
-                         children: [
-                           if (isCurrentPlaying)
-                             LinearProgressIndicator(
-                               value: playbackProgress,
-                               minHeight: 5,
-                               backgroundColor: Colors.grey[300],
-                               valueColor: AlwaysStoppedAnimation<Color>(brandGreyColor),
-                             ),
-                           // Invisible when not playing (prevents UI shifting)
-                           if (!isCurrentPlaying)
-                             GestureDetector(
-                               onTap: () => onDownload(filePath), // Click event
-                               child: Container(
-                                 height: 2, // Thickness of the line
-                                 decoration: BoxDecoration(
-                                   color: textColor, // Line color
-                                   borderRadius: BorderRadius.circular(1), // Optional: rounded edges
-                                 ),
-                               ),
-                             ),
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      isCurrentPlaying
+                          ? Icons.volume_up_rounded
+                          : Icons.volume_mute,
+                      color: brandGreyColor,
+                    ),
+                    onPressed: () {
+                      if (isCurrentPlaying) {
+                        _stopPlayback();
+                      } else {
+                        _playSegment(filePath);
+                      }
+                    },
+                  ),
+                  Text(
+                    filePath.split('/').last,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.download, color: brandGreyColor),
+                    onPressed: () => onDownload(filePath),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      isCurrentPlaying ? Icons.stop : Icons.play_arrow,
+                      color: brandGreyColor,
+                    ),
+                    onPressed: () {
+                      if (isCurrentPlaying) {
+                        _stopPlayback();
+                      } else {
+                        _playSegment(filePath);
+                      }
+                    },
+                  ),
+                  SizedBox(
+                    width: 100, // Fixed width to prevent shifting
+                    child: Stack(
+                      children: [
+                        if (isCurrentPlaying)
+                          LinearProgressIndicator(
+                            value: playbackProgress,
+                            minHeight: 5,
+                            backgroundColor: Colors.grey[300],
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(brandGreyColor),
+                          ),
+                        // Invisible when not playing (prevents UI shifting)
+                        if (!isCurrentPlaying)
+                          GestureDetector(
+                            onTap: () => onDownload(filePath), // Click event
+                            child: Container(
+                              height: 2, // Thickness of the line
+                              decoration: BoxDecoration(
+                                color: textColor, // Line color
+                                borderRadius: BorderRadius.circular(
+                                    1), // Optional: rounded edges
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
 
+                  // Download Button (Fixed Position)
 
-                         ],
-                       ),
-                     ),
-
-                     // Download Button (Fixed Position)
-
-                     IconButton(
-                       icon: const Icon(Icons.delete, color: brandGreyColor),
-                       onPressed: () => onDelete(index),
-                     ),
-                   ],
-                 );
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: brandGreyColor),
+                    onPressed: () => onDelete(index),
+                  ),
+                ],
+              );
             },
           ),
-
       ],
     );
   }

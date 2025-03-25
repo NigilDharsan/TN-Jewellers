@@ -101,18 +101,16 @@ class ApiClient extends GetxService {
   Future<Response> postMultipartDataConversation(
     String? uri,
     File file,
-    String receiverId,
   ) async {
     http.MultipartRequest request =
         http.MultipartRequest('POST', Uri.parse(appBaseUrl! + uri!));
     // request.headers.addAll(_mainHeaders);
 
-    request.fields['receiver_id'] = receiverId;
-    var stream = http.ByteStream(file.openRead())..cast();
-    var length = await file.length();
-    var multipartFile = http.MultipartFile('file', stream, length,
-        filename: basename(file.path));
-    request.files.add(multipartFile);
+    // var stream = http.ByteStream(file.openRead())..cast();
+    // var length = await file.length();
+    // var multipartFile = http.MultipartFile('file', stream, length,
+    //     filename: basename(file.path));
+    // request.files.add(multipartFile);
     final data = await request.send();
 
     http.Response response = await http.Response.fromStream(data);

@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:TNJewellers/src/OderScreen/model/OrderDetailsModel.dart';
 import 'package:TNJewellers/src/OderScreen/model/OrderListModel.dart';
 import 'package:TNJewellers/src/OderScreen/repository/OrderRepo.dart';
@@ -17,6 +21,9 @@ class OrderController extends GetxController implements GetxService {
 
   final formKeyOrder1 = GlobalKey<FormState>();
   final formKeyOrder2 = GlobalKey<FormState>();
+
+  List<Map<String, dynamic>> selectedFiles = [];
+  List<String> recordedFiles = [];
 
   var screenType = "orderone".obs; // Observable variable
   bool _isLoading = false;
@@ -40,11 +47,42 @@ class OrderController extends GetxController implements GetxService {
 
   _hideKeyboard() => FocusManager.instance.primaryFocus?.unfocus();
 
+  clearCreateDate() {
+    firstnameController.clear();
+    invoiceController.clear();
+    productTypeController.clear();
+    designController.clear();
+    weightController.clear();
+    sizeController.clear();
+    inchController.clear();
+    stoneController.clear();
+    stoneWeightController.clear();
+    quantityController.clear();
+    deliveryDateController.clear();
+    descriptionController.clear();
+    selectedFiles = [];
+  }
+
+  Future<List<Map<String, String>>> convertMultipleImagesToBytes(
+      List<Map<String, dynamic>> imageFiles) async {
+    List<Map<String, String>> byteList = [];
+
+    for (dynamic file in imageFiles) {
+      Uint8List bytes = await File(file['path']).readAsBytes();
+      byteList.add({"base64": base64Encode(bytes)});
+    }
+
+    return byteList;
+  }
+
   Future<bool> orderCreateResponse() async {
     _hideKeyboard();
     _isLoading = true;
     loaderController.showLoaderAfterBuild(_isLoading);
     update();
+
+    List<Map<String, String>> imageBytesList =
+        await convertMultipleImagesToBytes(selectedFiles);
 
     Map<String, dynamic> order_details = {
       "nick_name": firstnameController.text,
@@ -62,7 +100,7 @@ class OrderController extends GetxController implements GetxService {
       "customized_stone_wt": int.parse(stoneWeightController.text),
       "remarks": descriptionController.text,
       "stone_details": [],
-      "order_images": [],
+      "order_images": imageBytesList,
       "order_videos": [],
       "order_voices": [],
       "charges_details": [],
@@ -83,6 +121,8 @@ class OrderController extends GetxController implements GetxService {
       print("LOGIN RESPONSE ${response.body}");
 
       customSnackBar(response.body['message'], isError: false);
+
+      clearCreateDate();
 
       _isLoading = false;
       loaderController.showLoaderAfterBuild(_isLoading);
@@ -128,7 +168,7 @@ class OrderController extends GetxController implements GetxService {
     _isLoading = true;
     loaderController.showLoaderAfterBuild(_isLoading);
 
-    Response? response = await orderRepo.orderDetails("29");
+    Response? response = await orderRepo.orderDetails(selectedProductID);
     if (response != null && response.statusCode == 200) {
       orderDetailsModel = OrderDetailsModel.fromJson(response.body);
 

@@ -14,7 +14,7 @@ class OverlayLoaderWithAppIcon extends StatelessWidget {
   OverlayLoaderWithAppIcon({
     required this.isLoading,
     required this.child,
-    this.appIconSize = 100,
+    this.appIconSize = 160,
     this.borderRadius = 15,
     this.overlayOpacity = 0.5,
     this.circularProgressColor,
@@ -28,28 +28,28 @@ class OverlayLoaderWithAppIcon extends StatelessWidget {
       opacity: overlayOpacity,
       color: Colors.black,
       progressIndicator: Material(
-        color: brandPrimaryColor,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(borderRadius),
         child: Padding(
           padding:
               const EdgeInsets.only(top: 20, bottom: 20, left: 10, right: 10),
           child: SizedBox(
-            height: 120, // Increased height to accommodate loader
-            width: 120,
+            height: 180, // Increased height to accommodate loader
+            width: 180,
             child: Stack(
               alignment: Alignment.center,
               children: [
                 SizedBox(
                   width: appIconSize,
                   height: appIconSize,
-                  child: Image.asset(Images.logoPng),
+                  child: Image.asset(Images.splash),
                 ),
                 SizedBox(
                   width: appIconSize + 40, // Adjust size to fit inside the logo
                   height: appIconSize + 40,
                   child: CircularProgressIndicator(
-                    backgroundColor: circularProgressColor ?? brandPrimaryColor,
-                    color: Colors.white,
+                    backgroundColor: circularProgressColor ?? Colors.white,
+                    color: brandPrimaryColor,
                     strokeWidth: 10,
                   ),
                 ),

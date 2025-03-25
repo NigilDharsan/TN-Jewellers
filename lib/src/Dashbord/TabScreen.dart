@@ -2,6 +2,7 @@ import 'package:TNJewellers/Utils/core/helper/route_helper.dart';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../OderScreen/MyorderScreen.dart';
 import 'CartScreen.dart';
 import 'FavoriteScreen.dart';
@@ -15,15 +16,7 @@ class TabsScreen extends StatefulWidget {
 }
 
 class _TabsScreenState extends State<TabsScreen> {
-
-  bool isOrderNowSelected = true; // Default: ORDER NOW is selected
   int _selectedPageIndex = 0;
-  final List<Widget> _screens = [
-    MenuScreen(),
-    MyOrderScreen(),
-    FavoriteScreen(),
-    CartScreen(),
-  ];
 
   void _selectPage(int index) {
     setState(() {
@@ -32,18 +25,35 @@ class _TabsScreenState extends State<TabsScreen> {
   }
 
   void _openAddNewPage() {
-    setState(() {
-      isOrderNowSelected = true; // Select ORDER NOW
-    });
     Get.toNamed(RouteHelper.orderbasicscreen);
+  }
+
+  /// **Method to Get Current Screen**
+  Widget _getScreen(int index) {
+    switch (index) {
+      case 0:
+        return MenuScreen();
+      case 1:
+        return MyOrderScreen();
+      case 2:
+        return FavoriteScreen();
+      case 3:
+        return CartScreen();
+      default:
+        return MenuScreen();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedPageIndex,
-        children: _screens,
+      body: Navigator(
+        key: GlobalKey<NavigatorState>(),
+        onGenerateRoute: (settings) {
+          return MaterialPageRoute(
+            builder: (_) => _getScreen(_selectedPageIndex),
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _openAddNewPage,

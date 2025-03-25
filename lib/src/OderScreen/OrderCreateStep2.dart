@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:TNJewellers/src/OderScreen/controller/OrderController.dart';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:TNJewellers/utils/styles.dart';
+import 'package:TNJewellers/utils/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -82,117 +83,131 @@ class _OrderScreenTwoState extends State<OrderScreenTwo> {
     return Expanded(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextFieldRow('PRODUCT TYPE *', 'Product',
-                      controller.productTypeController),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _buildTextFieldRow(
-                      'DESIGN', 'Design', controller.designController),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextFieldRow('REQUIRED WEIGHT *', '12 Grams',
-                      controller.weightController),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _buildDimensionsRow(controller),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextFieldRow(
-                      'STONE', 'Stone', controller.stoneController),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _buildTextFieldRow('STONE WEIGHT', 'weight',
-                      controller.stoneWeightController),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextFieldRow('ORDER QUANTITY', 'Quantity',
-                      controller.quantityController),
-                ),
+        child: Form(
+          key: controller.formKeyOrder2,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: buildInputField(
+                        'Product',
+                        "PRODUCT TYPE *",
+                        controller.productTypeController,
+                        "Please enter your product",
+                        isRequired: true),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildTextFieldRow(
+                        'DESIGN', 'Design', controller.designController),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: buildInputField('12 Grams', "REQUIRED WEIGHT *",
+                        controller.weightController, "Please enter your grams",
+                        isRequired: true),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildDimensionsRow(controller),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTextFieldRow(
+                        'STONE', 'Stone', controller.stoneController),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildTextFieldRow('STONE WEIGHT', 'weight',
+                        controller.stoneWeightController),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTextFieldRow('ORDER QUANTITY', 'Quantity',
+                        controller.quantityController),
+                  ),
 
-                const SizedBox(width: 10), // Spacing between elements
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "EXPECTED DELIVERY DATE *",
-                        style: Order2,
-                      ),
-                      SizedBox(height: 5),
-                      GestureDetector(
-                        child: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            color: brandGoldLightColor, // Light grey background
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                                color: Colors.white,
-                                width: 2), // White border with width 2
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 5,
-                                offset: Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.calendar_today, color: Colors.grey),
-                              SizedBox(width: 2),
-                              Expanded(
-                                child: TextFormField(
-                                  controller: controller.deliveryDateController,
-                                  keyboardType: TextInputType.number,
-                                  readOnly: isDateDisplayed,
-                                  decoration: InputDecoration(
-                                    labelText: "Enter number of days",
-                                    labelStyle: TextStyle(
-                                        color:
-                                            brandGreySoftColor), // Set label text color to grey
-                                    border: InputBorder.none,
-                                    suffixIcon: isDateDisplayed
-                                        ? IconButton(
-                                            icon: Icon(Icons.clear),
-                                            onPressed: _clearInput,
-                                          )
-                                        : null,
-                                  ),
-                                  onChanged: _startConversionTimer,
+                  const SizedBox(width: 10), // Spacing between elements
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "EXPECTED DELIVERY DATE *",
+                          style: Order2,
+                        ),
+                        SizedBox(height: 5),
+                        GestureDetector(
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color:
+                                  brandGoldLightColor, // Light grey background
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                  color: Colors.white,
+                                  width: 2), // White border with width 2
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 5,
+                                  offset: Offset(0, 1),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.calendar_today, color: Colors.grey),
+                                SizedBox(width: 2),
+                                Expanded(
+                                  child: TextFormField(
+                                    controller:
+                                        controller.deliveryDateController,
+                                    keyboardType: TextInputType.number,
+                                    readOnly: isDateDisplayed,
+                                    decoration: InputDecoration(
+                                      labelText: "Enter number of days",
+                                      labelStyle: TextStyle(
+                                          color:
+                                              brandGreySoftColor), // Set label text color to grey
+                                      border: InputBorder.none,
+                                      suffixIcon: isDateDisplayed
+                                          ? IconButton(
+                                              icon: Icon(Icons.clear),
+                                              onPressed: _clearInput,
+                                            )
+                                          : null,
+                                    ),
+                                    validator: (value) {
+                                      if ((value == null || value.isEmpty))
+                                        return "Please enter delivery date";
+                                    },
+                                    onChanged: _startConversionTimer,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-          ],
+                ],
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );

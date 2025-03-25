@@ -15,6 +15,7 @@ class Images {
   static String get banner => 'banner'.png;
   static String get product_ear_ring => 'product_ear_ring'.png;
   static String get rightArrow => 'right_arrow'.png;
+  static String get splash => 'Splash'.png;
 
   static String get money => 'money'.png;
   static String get clock => 'clock'.png;

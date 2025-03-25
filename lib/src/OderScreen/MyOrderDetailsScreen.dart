@@ -4,7 +4,6 @@ import 'package:TNJewellers/utils/styles.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:path/path.dart';
 
 class MyOrderDetailsScreen extends StatefulWidget {
   const MyOrderDetailsScreen({super.key});
@@ -29,133 +28,116 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<OrderController>(
-        initState: (state) =>
-            Get.find<OrderController>().getOrderDetailsResponse(),
-        builder: (controller) {
-          return _buildBody(controller);
-        });
-  }
-
-  Widget _buildBody(OrderController controller) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
         title: Text("ORDER DETAILS"),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildRingValue(
-                  '', controller.orderDetailsModel!.data?.productName ?? ""),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildcontainerValue(
-                        'Status',
-                        controller.orderDetailsModel!.data?.customerNickName ??
-                            ""),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _buildTextWithValue(
-                        'Delivery Date',
-                        controller.orderDetailsModel!.data?.expDeliveryDate ??
-                            ""),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _buildTextWithValue('Pick-up by',
-                        controller.orderDetailsModel!.data?.orderNo ?? ""),
-                  ),
-                ],
-              ),
-              SizedBox(height: 15),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildTextWithValue(
-                        'Customer Name',
-                        controller.orderDetailsModel!.data?.customerNickName ??
-                            ""),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _buildTextWithValue('Invoice Number',
-                        controller.orderDetailsModel!.data?.orderNo ?? ""),
-                  ),
-                ],
-              ),
-              SizedBox(height: 15),
-              _buildUploadDocumentSection(),
-              SizedBox(height: 15),
-              _buildAudioSection(),
-              SizedBox(height: 15),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildTextWithValue('Description',
-                        controller.orderDetailsModel!.data?.remarks ?? ""),
-                  ),
-                  Expanded(
-                    child: _buildTextWithValue('Expected Delivery Date',
-                        controller.orderDetailsModel!.data?.expDeliveryDate ?? ""),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildTextWithValue('Product Type',
-                        controller.orderDetailsModel!.data?.orderType ?? ""),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _buildTextWithValue('Design',
-                        controller.orderDetailsModel!.data?.designName ?? ""),
-                  ),
-                ],
-              ),
-              SizedBox(height: 15),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildTextWithValue(
-                        'Required Weight',
-                        controller.orderDetailsModel!.data?.reqWt.toString() ??
-                            ""),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _buildTextWithValue('Size', '15 WX 12 H'),
-                  ),
-                ],
-              ),
-              SizedBox(height: 15),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildTextWithValue('Stone',
-                        controller.orderDetailsModel!.data?.stoneName ?? ""),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _buildTextWithValue(
-                        'Stone Weight',
-                        controller.orderDetailsModel!.data?.stoneWt
-                                .toString() ??
-                            ""),
-                  ),
-                ],
-              ),
-              SizedBox(height: 15),
-            ],
-          ),
+      body: GetBuilder<OrderController>(
+          initState: (state) =>
+              Get.find<OrderController>().getOrderDetailsResponse(),
+          builder: (controller) {
+            return controller.isLoading
+                ? SizedBox.shrink()
+                : _buildBody(controller);
+          }),
+    );
+  }
+
+  Widget _buildBody(OrderController controller) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildRingValue(
+                '', controller.orderDetailsModel!.data?.productName ?? ""),
+            SizedBox(height: 10),
+            _buildcontainerValue(
+                'Status', controller.orderDetailsModel!.data?.status ?? ""),
+            SizedBox(height: 15),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTextWithValue(
+                      'Customer Name',
+                      controller.orderDetailsModel!.data?.customerNickName ??
+                          ""),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildTextWithValue('Invoice Number',
+                      controller.orderDetailsModel!.data?.orderNo ?? ""),
+                ),
+              ],
+            ),
+            SizedBox(height: 15),
+            _buildUploadDocumentSection(),
+            SizedBox(height: 15),
+            _buildAudioSection(),
+            SizedBox(height: 15),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTextWithValue('Description',
+                      controller.orderDetailsModel!.data?.remarks ?? ""),
+                ),
+                Expanded(
+                  child: _buildTextWithValue(
+                      'Expected Delivery Date',
+                      controller.orderDetailsModel!.data?.expDeliveryDate ??
+                          ""),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTextWithValue('Product Type',
+                      controller.orderDetailsModel!.data?.orderType ?? ""),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildTextWithValue('Design',
+                      controller.orderDetailsModel!.data?.designName ?? ""),
+                ),
+              ],
+            ),
+            SizedBox(height: 15),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTextWithValue(
+                      'Required Weight',
+                      controller.orderDetailsModel!.data?.reqWt.toString() ??
+                          ""),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildTextWithValue('Size', '15 WX 12 H'),
+                ),
+              ],
+            ),
+            SizedBox(height: 15),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTextWithValue('Stone',
+                      controller.orderDetailsModel!.data?.stoneName ?? ""),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildTextWithValue(
+                      'Stone Weight',
+                      controller.orderDetailsModel!.data?.stoneWt.toString() ??
+                          ""),
+                ),
+              ],
+            ),
+            SizedBox(height: 15),
+          ],
         ),
       ),
     );
@@ -189,13 +171,15 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
         ),
         SizedBox(height: 10),
         Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 5),
+          width: 100,
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(3), color: Colors.green),
-          child: Text(
-            value,
-            style: order_container,
+          child: Center(
+            child: Text(
+              value,
+              style: order_container,
+            ),
           ),
         ),
       ],

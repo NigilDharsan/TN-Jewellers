@@ -4,6 +4,7 @@ import 'package:TNJewellers/utils/core/helper/route_helper.dart';
 import 'package:TNJewellers/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../../utils/colors.dart';
 import '../../utils/images.dart';
 
@@ -286,41 +287,58 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
             ),
             SizedBox(height: 8),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Customer Name", style: order_normal),
-                    Text(product.customerNickName ?? "N/A", style: order_bold),
-                  ],
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Customer Name", style: order_normal),
+                      Text(product.customerNickName ?? "", style: order_bold),
+                    ],
+                  ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Weight", style: order_normal),
-                    Text(product.weight ?? "N/A", style: order_bold),
-                  ],
+                SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Weight", style: order_normal),
+                      Text(product.weight ?? "N/A", style: order_bold),
+                    ],
+                  ),
                 ),
               ],
             ),
+            SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Delivery Date", style: order_normal),
-                    Text(product.customerDueDate ?? "No Due Date",
-                        style: order_bold),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Delivery Date", style: order_normal),
+                      Text(product.customerDueDate ?? "No Due Date",
+                          style: order_bold),
+                    ],
+                  ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Other Status", style: order_normal),
-                    Text(product.status ?? "Status", style: order_bold),
-                  ],
+                SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Other Status", style: order_normal),
+                      Text(product.status ?? "Status", style: order_bold),
+                    ],
+                  ),
                 ),
               ],
             )
