@@ -770,7 +770,10 @@ Widget signInPassword(context,
 
 Widget buildInputField(String hintName, String label,
     TextEditingController controller, String errorMsg,
-    {bool isNumber = false, bool isEmail = false, bool isRequired = true}) {
+    {bool isPhone = false,
+    bool isNumber = false,
+    bool isEmail = false,
+    bool isRequired = true}) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -797,7 +800,11 @@ Widget buildInputField(String hintName, String label,
           padding: const EdgeInsets.all(1.0),
           child: TextFormField(
             controller: controller,
-            keyboardType: isNumber ? TextInputType.phone : TextInputType.text,
+            keyboardType: isPhone
+                ? TextInputType.phone
+                : isNumber
+                    ? TextInputType.number
+                    : TextInputType.text,
             validator: (value) {
               if (isRequired && (value == null || value.isEmpty))
                 return errorMsg;

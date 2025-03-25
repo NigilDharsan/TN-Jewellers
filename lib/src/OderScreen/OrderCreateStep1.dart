@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:TNJewellers/src/Dashbord/TabScreen.dart';
 import 'package:TNJewellers/src/OderScreen/OrderCreateStep2.dart';
 import 'package:TNJewellers/src/OderScreen/OrderCreateStep3.dart';
 import 'package:TNJewellers/src/OderScreen/StepIndicator.dart';
@@ -348,22 +349,22 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
 
     if (Get.find<OrderController>().screenType.value == "orderone") {
       if (Get.find<OrderController>().formKeyOrder1.currentState!.validate()) {
-        // if (selectedFiles.isEmpty) {
-        //   Get.snackbar("Error", "Please upload at least one photo or video",
-        //       backgroundColor: Colors.red, colorText: Colors.white);
-        //   return;
-        // } else if (_recordedFiles.isEmpty) {
-        //   Get.snackbar("Error", "Please record at least one audio file",
-        //       backgroundColor: Colors.red, colorText: Colors.white);
-        //   return;
-        // } else {
-        Get.find<OrderController>().selectedFiles = selectedFiles;
-        Get.find<OrderController>().recordedFiles = _recordedFiles;
-        Get.find<OrderController>().screenType.value = "ordertwo";
-        setState(() {
-          currentStep = 2;
-        });
-        // }
+        if (selectedFiles.isEmpty) {
+          Get.snackbar("Error", "Please upload at least one photo or video",
+              backgroundColor: Colors.red, colorText: Colors.white);
+          return;
+        } else if (_recordedFiles.isEmpty) {
+          Get.snackbar("Error", "Please record at least one audio file",
+              backgroundColor: Colors.red, colorText: Colors.white);
+          return;
+        } else {
+          Get.find<OrderController>().selectedFiles = selectedFiles;
+          Get.find<OrderController>().recordedFiles = _recordedFiles;
+          Get.find<OrderController>().screenType.value = "ordertwo";
+          setState(() {
+            currentStep = 2;
+          });
+        }
       } else {
         return;
       }
@@ -379,7 +380,7 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
       if (results) {
         Navigator.pop(context); // Close the dialog
 
-        Get.back();
+        Get.offAll(() => TabsScreen(pageIndex: 1));
       }
     }
   }
@@ -478,7 +479,7 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                                 "NICK NAME",
                                 controller.firstnameController,
                                 "Please enter your name",
-                                isRequired: false),
+                                isRequired: true),
                             SizedBox(height: 10),
                             buildInputField(
                                 'Enter Invoice/Ref No',

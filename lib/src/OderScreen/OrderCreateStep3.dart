@@ -54,10 +54,12 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
                   ),
                 ],
               ),
-              SizedBox(height: 15),
-              _buildUploadDocumentSection(),
-              SizedBox(height: 15),
-              _buildAudioSection(),
+              controller.selectedFiles.length != 0
+                  ? _buildUploadDocumentSection(controller)
+                  : SizedBox.shrink(),
+              controller.recordedFiles.length != 0
+                  ? _buildAudioSection(controller)
+                  : SizedBox.shrink(),
               SizedBox(height: 15),
               Row(
                 children: [
@@ -155,41 +157,87 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
   }
 
 // Widget for Upload Document Section
-  Widget _buildUploadDocumentSection() {
+  Widget _buildUploadDocumentSection(OrderController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Upload Document',
-            style: order_style),
+        SizedBox(height: 15),
+        Text('Upload Document', style: order_style),
         SizedBox(height: 5),
-        Row(
-          children: [
-            Icon(Icons.photo, color: brandGreyColor),
-            SizedBox(width: 5),
-            Text('photo.01.jpg',style: order_style2,),
-            Icon(Icons.download, color: brandGreyColor),
-            Icon(Icons.remove_red_eye, color: brandGreyColor),
-          ],
+        SizedBox(
+          height:
+              controller.selectedFiles.length * 30, // Adjust height as needed
+          child: ListView.builder(
+            scrollDirection: Axis.vertical,
+            itemCount: controller.selectedFiles.length,
+            itemBuilder: (context, index) {
+              return SizedBox(
+                height: 30,
+                child: Row(
+                  children: [
+                    Icon(Icons.photo, color: brandGreyColor),
+                    SizedBox(width: 5),
+                    SizedBox(
+                      width: 100,
+                      child: Text(
+                        getLastFileNameWithExtension(
+                            controller.selectedFiles[index]['path']),
+                        style: order_style2,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                    Icon(Icons.download, color: brandGreyColor),
+                    Icon(Icons.remove_red_eye, color: brandGreyColor),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ],
     );
   }
 
+  String getLastFileNameWithExtension(String filePaths) {
+    if (filePaths.isNotEmpty) {
+      return filePaths.split('/').last; // Extract file name with extension
+    }
+    return "No file selected";
+  }
+
 // Widget for Audio Section
-  Widget _buildAudioSection() {
+  Widget _buildAudioSection(OrderController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Audio File',
-            style: order_style),
+        SizedBox(height: 15),
+        Text('Audio File', style: order_style),
         SizedBox(height: 5),
-        Row(
-          children: [
-            Icon(Icons.volume_up, color: brandGreyColor),
-            Text('audio.01.mp3',style: order_style2,),
-            Icon(Icons.download, color: brandGreyColor),
-            Icon(Icons.play_arrow, color: brandGreyColor),
-          ],
+        SizedBox(
+          height:
+              controller.selectedFiles.length * 50, // Adjust height as needed
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: controller.selectedFiles.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: Row(
+                  children: [
+                    Icon(Icons.volume_up, color: brandGreyColor),
+                    SizedBox(width: 5),
+                    Text(
+                        getLastFileNameWithExtension(
+                            controller.recordedFiles[index]),
+                        style: order_style2),
+                    Icon(Icons.download, color: brandGreyColor),
+                    Icon(Icons.play_arrow, color: brandGreyColor),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ],
     );

@@ -9,14 +9,22 @@ import 'FavoriteScreen.dart';
 import 'MenuScreen.dart';
 
 class TabsScreen extends StatefulWidget {
-  const TabsScreen({super.key});
+  final int pageIndex;
+
+  const TabsScreen({super.key, this.pageIndex = 0}); // Default to first tab
 
   @override
   State<TabsScreen> createState() => _TabsScreenState();
 }
 
 class _TabsScreenState extends State<TabsScreen> {
-  int _selectedPageIndex = 0;
+  late int _selectedPageIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedPageIndex = widget.pageIndex; // Set default index from parameter
+  }
 
   void _selectPage(int index) {
     setState(() {
@@ -24,11 +32,6 @@ class _TabsScreenState extends State<TabsScreen> {
     });
   }
 
-  void _openAddNewPage() {
-    Get.toNamed(RouteHelper.orderbasicscreen);
-  }
-
-  /// **Method to Get Current Screen**
   Widget _getScreen(int index) {
     switch (index) {
       case 0:
@@ -47,16 +50,9 @@ class _TabsScreenState extends State<TabsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Navigator(
-        key: GlobalKey<NavigatorState>(),
-        onGenerateRoute: (settings) {
-          return MaterialPageRoute(
-            builder: (_) => _getScreen(_selectedPageIndex),
-          );
-        },
-      ),
+      body: _getScreen(_selectedPageIndex),
       floatingActionButton: FloatingActionButton(
-        onPressed: _openAddNewPage,
+        onPressed: () => Get.toNamed(RouteHelper.orderbasicscreen),
         backgroundColor: brandPrimaryColor,
         shape: const CircleBorder(),
         child: const Icon(Icons.add, size: 30, color: Colors.white),
@@ -69,22 +65,13 @@ class _TabsScreenState extends State<TabsScreen> {
         unselectedItemColor: Colors.brown,
         type: BottomNavigationBarType.fixed,
         items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'MENU'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.menu),
-            label: 'MENU',
-          ),
+              icon: Icon(Icons.card_travel), label: 'MY ORDER'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.card_travel),
-            label: 'MY ORDER',
-          ),
+              icon: Icon(Icons.favorite_border), label: 'FAVORITE'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_border),
-            label: 'FAVORITE',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'CART',
-          ),
+              icon: Icon(Icons.shopping_cart), label: 'CART'),
         ],
       ),
     );

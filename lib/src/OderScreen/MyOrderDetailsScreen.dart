@@ -73,10 +73,12 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 15),
-            _buildUploadDocumentSection(controller),
-            SizedBox(height: 15),
-            _buildAudioSection(),
+            (controller.orderDetailsModel!.data?.images?.length ?? 0) != 0
+                ? _buildUploadDocumentSection(controller)
+                : SizedBox.shrink(),
+            (controller.orderDetailsModel!.data?.audios?.length ?? 0) != 0
+                ? _buildAudioSection()
+                : SizedBox.shrink(),
             SizedBox(height: 15),
             Row(
               children: [
@@ -219,6 +221,7 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        SizedBox(height: 15),
         Text('Upload Document', style: order_style),
         SizedBox(height: 5),
         Row(
@@ -248,6 +251,7 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        SizedBox(height: 15),
         Text('Audio File', style: order_style),
         SizedBox(height: 5),
         Container(

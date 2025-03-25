@@ -10,6 +10,7 @@ import 'package:TNJewellers/utils/Loader/loader_utils.dart';
 import 'package:TNJewellers/utils/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class OrderController extends GetxController implements GetxService {
   final OrderRepo orderRepo;
@@ -61,18 +62,43 @@ class OrderController extends GetxController implements GetxService {
     deliveryDateController.clear();
     descriptionController.clear();
     selectedFiles = [];
+    recordedFiles = [];
   }
 
-  Future<List<Map<String, String>>> convertMultipleImagesToBytes(
+  Future<Map<String, List<Map<String, String>>>> convertMultipleImagesToBytes(
       List<Map<String, dynamic>> imageFiles) async {
-    List<Map<String, String>> byteList = [];
+    List<Map<String, String>> imgByteList = [];
+    List<Map<String, String>> videoByteList = [];
 
-    for (dynamic file in imageFiles) {
+    for (var file in imageFiles) {
       Uint8List bytes = await File(file['path']).readAsBytes();
-      byteList.add({"base64": base64Encode(bytes)});
+      String base64String = base64Encode(bytes);
+
+      if (file['type'] == 'video') {
+        videoByteList.add({"base64": base64String});
+      } else {
+        imgByteList.add({"base64": base64String});
+      }
     }
 
-    return byteList;
+    return {
+      "videos": videoByteList,
+      "images": imgByteList,
+    };
+  }
+
+  Future<List<Map<String, String>>> convertMultipleAudioToBytes(
+      List<String> audioFiles) async {
+    List<Map<String, String>> audioByteList = [];
+
+    for (var file in audioFiles) {
+      Uint8List bytes = await File(file).readAsBytes();
+      String base64String = base64Encode(bytes);
+
+      audioByteList.add({"base64": base64String});
+    }
+
+    return audioByteList;
   }
 
   Future<bool> orderCreateResponse() async {
@@ -81,28 +107,39 @@ class OrderController extends GetxController implements GetxService {
     loaderController.showLoaderAfterBuild(_isLoading);
     update();
 
-    List<Map<String, String>> imageBytesList =
+    int? daysToAdd = int.tryParse(
+        deliveryDateController.text == "" ? "1" : deliveryDateController.text);
+    DateTime futureDate = DateTime.now().add(Duration(days: daysToAdd!));
+    String formattedDate = DateFormat('yyyy-MM-dd').format(futureDate);
+
+    Map<String, List<Map<String, String>>> result =
         await convertMultipleImagesToBytes(selectedFiles);
+
+    final audioArr = await convertMultipleAudioToBytes(recordedFiles);
 
     Map<String, dynamic> order_details = {
       "nick_name": firstnameController.text,
       "customized_ref_no": invoiceController.text,
       "customized_product_name": productTypeController.text,
       "customized_design_name": designController.text,
-      "dimension": sizeController.text + " " + inchController.text,
-      "pieces": int.parse(quantityController.text),
+      "dimension": sizeController.text == ""
+          ? "1"
+          : sizeController.text + " " + inchController.text,
+      "pieces": int.parse(
+          quantityController.text == "" ? "0" : quantityController.text),
       "gross_wt": weightController.text,
-      "less_wt": stoneWeightController.text,
+      "less_wt": "0",
       "net_wt":
-          "${double.parse(weightController.text) - double.parse(stoneWeightController.text ?? "0")}",
-      "customer_due_date": deliveryDateController.text,
+          "${double.parse(weightController.text) - double.parse(stoneWeightController.text == "" ? "0" : stoneWeightController.text)}",
+      "customer_due_date": formattedDate,
       "customized_stone_name": stoneController.text,
-      "customized_stone_wt": int.parse(stoneWeightController.text),
+      "customized_stone_wt": int.parse(
+          stoneWeightController.text == "" ? "0" : stoneWeightController.text),
       "remarks": descriptionController.text,
       "stone_details": [],
-      "order_images": imageBytesList,
-      "order_videos": [],
-      "order_voices": [],
+      "order_images": result['images'],
+      "order_videos": result['videos'],
+      "order_voices": audioArr,
       "charges_details": [],
       "attribute_details": [],
       "other_metal_details": []

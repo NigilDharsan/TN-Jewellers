@@ -61,7 +61,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           "Your Mobile No *",
                           controller.mobileController,
                           "Please enter a valid mobile number",
-                          isNumber: true),
+                          isPhone: true),
                       SizedBox(height: 20),
                       buildInputField('Email', "Email",
                           controller.emailController, "Enter a valid email",

@@ -33,6 +33,7 @@ class Data {
   String? remarks;
   List<Images>? images;
   List<Videos>? videos;
+  List<Audios>? audios;
 
   Data(
       {this.customerNickName,
@@ -50,7 +51,8 @@ class Data {
       this.dimension,
       this.remarks,
       this.images,
-      this.videos});
+      this.videos,
+      this.audios});
 
   Data.fromJson(Map<String, dynamic> json) {
     customerNickName = json['customer_nick_name'];
@@ -79,6 +81,12 @@ class Data {
         videos!.add(Videos.fromJson(v));
       });
     }
+    if (json['audios'] != null) {
+      audios = <Audios>[];
+      json['audios'].forEach((v) {
+        audios!.add(Audios.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -103,6 +111,9 @@ class Data {
     if (videos != null) {
       data['videos'] = videos!.map((v) => v.toJson()).toList();
     }
+    if (audios != null) {
+      data['audios'] = audios!.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 }
@@ -119,7 +130,7 @@ class Images {
     detOrderImgId = json['det_order_img_id'];
     name = json['name'];
     image = json['image'];
-    orderDetail = json['order_detail'];
+    orderDetail = json['order_detail'].toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -153,6 +164,31 @@ class Videos {
     data['order_detail'] = orderDetail;
     data['name'] = name;
     data['video'] = video;
+    return data;
+  }
+}
+
+class Audios {
+  int? detOrderAudioId;
+  int? orderDetail;
+  String? name;
+  String? audio;
+
+  Audios({this.detOrderAudioId, this.orderDetail, this.name, this.audio});
+
+  Audios.fromJson(Map<String, dynamic> json) {
+    detOrderAudioId = json['det_order_audio_id'];
+    orderDetail = json['order_detail'];
+    name = json['name'];
+    audio = json['audio'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['det_order_audio_id'] = this.detOrderAudioId;
+    data['order_detail'] = this.orderDetail;
+    data['name'] = this.name;
+    data['audio'] = this.audio;
     return data;
   }
 }
