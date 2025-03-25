@@ -36,16 +36,16 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   cached_network_image:
-  connectivity_plus: 
+  connectivity_plus:
   device_info_plus:
 
-  flutter_svg: 
-  fluttertoast: 
+  flutter_svg:
+  fluttertoast:
   flutter_switch:
-  get: 
+  get:
   get_storage:
-  http: 
-  image_picker: 
+  http:
+  image_picker:
   intl:
 
 
@@ -54,14 +54,15 @@ dependencies:
   collection:
 
   path:
-  path_provider: 
-  permission_handler: 
+  path_provider:
+  permission_handler:
   shared_preferences:
   file_picker:
   flutter_sound:
   video_player:
 
   audioplayers:
+
 
 
 

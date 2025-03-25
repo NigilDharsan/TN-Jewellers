@@ -159,7 +159,7 @@ TextStyle order_normal = TextStyle(
   fontFamily: 'JosefinSans',
   fontSize: 13,
   color: brandGreySoftColor,
-  fontWeight: FontWeight.w500,
+  fontWeight: FontWeight.w600,
 );
 TextStyle order_bold = TextStyle(
   fontFamily: 'JosefinSans',

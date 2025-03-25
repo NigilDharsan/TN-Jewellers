@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
@@ -190,8 +191,26 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
     });
   }
 
-  void _downloadRecording(String filePath) {
-    print("Downloading: $filePath");
+  void _downloadRecording(String filePath) async {
+    try {
+      var status = await Permission.storage.request();
+      if (!status.isGranted) {
+        print("Storage permission denied");
+        return;
+      }
+      Directory? downloadsDir = await getExternalStorageDirectory();
+      if (downloadsDir == null) {
+        print("Failed to get downloads directory");
+        return;
+      }
+      String newFilePath = "${downloadsDir.path}/DownloadedAudio.mp3";
+      File file = File(filePath);
+      await file.copy(newFilePath);
+      print("File saved to: $newFilePath");
+      OpenFile.open(newFilePath);
+    } catch (e) {
+      print("Error downloading file: $e");
+    }
   }
 
   Future<void> _saveMedia() async {
@@ -529,7 +548,8 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
                               elapsedTime: '$_elapsedTime',
                               recordedFiles: _recordedFiles,
                               onRecord: _startRecording,
-                              onStop: _stopRecording, // Fixed typo
+                              onStop: _stopRecording,
+                              // Fixed typo
                               onDelete: _deleteRecording,
                               onPlay: _playSegment,
                               onDownload: _downloadRecording,
@@ -726,8 +746,9 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
               ),
             ),
             validator: (value) {
-              if ((value == null || value.isEmpty))
+              if ((value == null || value.isEmpty)) {
                 return "Please enter description";
+              }
             },
           ),
         ),
@@ -786,89 +807,166 @@ class _OrderbasicscreenState extends State<Orderbasicscreen> {
         if (recordedFiles.isNotEmpty)
           ListView.builder(
             shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            // Ensures no scrolling conflict
             itemCount: recordedFiles.length,
             itemBuilder: (context, index) {
               String filePath = recordedFiles[index];
               bool isCurrentPlaying =
                   _isPlaying && _currentFilePath == filePath;
-              return Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      isCurrentPlaying
-                          ? Icons.volume_up_rounded
-                          : Icons.volume_mute,
-                      color: brandGreyColor,
+              return Container(
+                width: double.infinity, // Ensures Row does not overflow
+                padding: EdgeInsets.symmetric(vertical: 5), // Optional padding
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        isCurrentPlaying
+                            ? Icons.volume_up_rounded
+                            : Icons.volume_mute,
+                        color: brandGreyColor,
+                      ),
+                      onPressed: () {
+                        if (isCurrentPlaying) {
+                          _stopPlayback();
+                        } else {
+                          _playSegment(filePath);
+                        }
+                      },
                     ),
-                    onPressed: () {
-                      if (isCurrentPlaying) {
-                        _stopPlayback();
-                      } else {
-                        _playSegment(filePath);
-                      }
-                    },
-                  ),
-                  Text(
-                    filePath.split('/').last,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.download, color: brandGreyColor),
-                    onPressed: () => onDownload(filePath),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      isCurrentPlaying ? Icons.stop : Icons.play_arrow,
-                      color: brandGreyColor,
+                    Expanded(
+                      child: Text(
+                        filePath.split('/').last,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1, // Ensures single-line display
+                        softWrap: false,
+                      ),
                     ),
-                    onPressed: () {
-                      if (isCurrentPlaying) {
-                        _stopPlayback();
-                      } else {
-                        _playSegment(filePath);
-                      }
-                    },
-                  ),
-                  SizedBox(
-                    width: 100, // Fixed width to prevent shifting
-                    child: Stack(
-                      children: [
-                        if (isCurrentPlaying)
-                          LinearProgressIndicator(
-                            value: playbackProgress,
-                            minHeight: 5,
-                            backgroundColor: Colors.grey[300],
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(brandGreyColor),
-                          ),
-                        // Invisible when not playing (prevents UI shifting)
-                        if (!isCurrentPlaying)
-                          GestureDetector(
-                            onTap: () => onDownload(filePath), // Click event
-                            child: Container(
-                              height: 2, // Thickness of the line
-                              decoration: BoxDecoration(
-                                color: textColor, // Line color
-                                borderRadius: BorderRadius.circular(
-                                    1), // Optional: rounded edges
-                              ),
+                    IconButton(
+                      icon: const Icon(Icons.download, color: brandGreyColor),
+                      onPressed: () => onDownload(filePath),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        isCurrentPlaying ? Icons.stop : Icons.play_arrow,
+                        color: brandGreyColor,
+                      ),
+                      onPressed: () {
+                        if (isCurrentPlaying) {
+                          _stopPlayback();
+                        } else {
+                          _playSegment(filePath);
+                        }
+                      },
+                    ),
+                    SizedBox(
+                      width: 60, // Fixed width to prevent shifting
+                      child: isCurrentPlaying
+                          ? LinearProgressIndicator(
+                              value: playbackProgress,
+                              minHeight: 5,
+                              backgroundColor: Colors.grey[300],
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(brandGreyColor),
+                            )
+                          : Container(
+                              height: 2, // Placeholder Line when not playing
+                              color: textColor.withOpacity(0.5),
                             ),
-                          ),
-                      ],
                     ),
-                  ),
-
-                  // Download Button (Fixed Position)
-
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: brandGreyColor),
-                    onPressed: () => onDelete(index),
-                  ),
-                ],
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: brandGreyColor),
+                      onPressed: () => onDelete(index),
+                    ),
+                  ],
+                ),
               );
             },
           ),
+
+        // ListView.builder(
+        //   shrinkWrap: true,
+        //   itemCount: recordedFiles.length,
+        //   itemBuilder: (context, index) {
+        //     String filePath = recordedFiles[index];
+        //     bool isCurrentPlaying =
+        //         _isPlaying && _currentFilePath == filePath;
+        //     return Row(
+        //       mainAxisSize: MainAxisSize.min,
+        //       children: [
+        //         IconButton(
+        //           icon: Icon(
+        //             isCurrentPlaying
+        //                 ? Icons.volume_up_rounded
+        //                 : Icons.volume_mute,
+        //             color: brandGreyColor,
+        //           ),
+        //           onPressed: () {
+        //             if (isCurrentPlaying) {
+        //               _stopPlayback();
+        //             } else {
+        //               _playSegment(filePath);
+        //             }
+        //           },
+        //         ),
+        //         Text(
+        //           filePath.split('/').last,
+        //           overflow: TextOverflow.ellipsis,
+        //         ),
+        //         IconButton(
+        //           icon: const Icon(Icons.download, color: brandGreyColor),
+        //           onPressed: () => onDownload(filePath),
+        //         ),
+        //         IconButton(
+        //           icon: Icon(
+        //             isCurrentPlaying ? Icons.stop : Icons.play_arrow,
+        //             color: brandGreyColor,
+        //           ),
+        //           onPressed: () {
+        //             if (isCurrentPlaying) {
+        //               _stopPlayback();
+        //             } else {
+        //               _playSegment(filePath);
+        //             }
+        //           },
+        //         ),
+        //         SizedBox(
+        //           width: 100, // Fixed width to prevent shifting
+        //           child: Stack(
+        //             children: [
+        //               if (isCurrentPlaying)
+        //                 LinearProgressIndicator(
+        //                   value: playbackProgress,
+        //                   minHeight: 5,
+        //                   backgroundColor: Colors.grey[300],
+        //                   valueColor:
+        //                       AlwaysStoppedAnimation<Color>(brandGreyColor),
+        //                 ),
+        //               // Invisible when not playing (prevents UI shifting)
+        //               if (!isCurrentPlaying)
+        //                 GestureDetector(
+        //                   onTap: () => onDownload(filePath), // Click event
+        //                   child: Container(
+        //                     height: 2, // Thickness of the line
+        //                     decoration: BoxDecoration(
+        //                       color: textColor, // Line color
+        //                       borderRadius: BorderRadius.circular(
+        //                           1), // Optional: rounded edges
+        //                     ),
+        //                   ),
+        //                 ),
+        //             ],
+        //           ),
+        //         ),
+        //         // Download Button (Fixed Position)
+        //         IconButton(
+        //           icon: const Icon(Icons.delete, color: brandGreyColor),
+        //           onPressed: () => onDelete(index),
+        //         ),
+        //       ],
+        //     );
+        //   },
+        // ),
       ],
     );
   }

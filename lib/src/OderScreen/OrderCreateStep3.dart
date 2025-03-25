@@ -1,4 +1,5 @@
 import 'package:TNJewellers/src/OderScreen/controller/OrderController.dart';
+import 'package:TNJewellers/utils/colors.dart';
 import 'package:TNJewellers/utils/styles.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -163,11 +164,11 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
         SizedBox(height: 5),
         Row(
           children: [
-            Icon(Icons.photo, color: Colors.blue),
+            Icon(Icons.photo, color: brandGreyColor),
             SizedBox(width: 5),
             Text('photo.01.jpg',style: order_style2,),
-            Icon(Icons.download, color: Colors.blue),
-            Icon(Icons.remove_red_eye, color: Colors.grey),
+            Icon(Icons.download, color: brandGreyColor),
+            Icon(Icons.remove_red_eye, color: brandGreyColor),
           ],
         ),
       ],
@@ -182,15 +183,13 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
         Text('Audio File',
             style: order_style),
         SizedBox(height: 5),
-        Container(
-          child: Row(
-            children: [
-              Icon(Icons.audiotrack, color: Colors.green),
-              Text('audio.01.mp3',style: order_style2,),
-              Icon(Icons.download, color: Colors.blue),
-              Icon(Icons.play_arrow, color: Colors.red),
-            ],
-          ),
+        Row(
+          children: [
+            Icon(Icons.volume_up, color: brandGreyColor),
+            Text('audio.01.mp3',style: order_style2,),
+            Icon(Icons.download, color: brandGreyColor),
+            Icon(Icons.play_arrow, color: brandGreyColor),
+          ],
         ),
       ],
     );

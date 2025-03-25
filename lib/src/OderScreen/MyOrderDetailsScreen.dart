@@ -74,7 +74,7 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
               ],
             ),
             SizedBox(height: 15),
-            _buildUploadDocumentSection(),
+            _buildUploadDocumentSection(controller),
             SizedBox(height: 15),
             _buildAudioSection(),
             SizedBox(height: 15),
@@ -143,7 +143,6 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
     );
   }
 
-// Widget for displaying label and value
   Widget _buildTextWithValue(String label, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,7 +215,7 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
   }
 
 // Widget for Upload Document Section
-  Widget _buildUploadDocumentSection() {
+  Widget _buildUploadDocumentSection(OrderController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -226,7 +225,14 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
           children: [
             Icon(Icons.photo, color: brandGreyColor),
             SizedBox(width: 5),
-            Text('photo.01.jpg', style: order_style2),
+            SizedBox(
+                height: 100,
+                width: 150,
+                child: Image.network(
+                  controller.orderDetailsModel!.data?.images?[0].image ?? "",
+                  fit: BoxFit.cover,
+                ) // Hides the widget if no image is available
+                ),
             SizedBox(width: 5),
             Icon(Icons.download, color: brandGreyColor),
             SizedBox(width: 5),
