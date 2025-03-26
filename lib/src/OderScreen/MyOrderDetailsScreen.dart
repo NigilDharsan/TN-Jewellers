@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:TNJewellers/src/OderScreen/controller/OrderController.dart';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:TNJewellers/utils/styles.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MyOrderDetailsScreen extends StatefulWidget {
   const MyOrderDetailsScreen({super.key});
@@ -15,16 +19,34 @@ class MyOrderDetailsScreen extends StatefulWidget {
 class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
   String? audioFile;
   int currentStep = 3;
+  bool isCurrentPlaying = false; // Tracks if audio is currently playing
+  String? currentPlayingFile;
+  bool _isImageVisible = true; // Variable to track image visibility
 
-  void pickAudioFile() async {
-    FilePickerResult? result =
-        await FilePicker.platform.pickFiles(type: FileType.audio);
-    if (result != null) {
+  final AudioPlayer _audioPlayer = AudioPlayer(); // Initialize AudioPlayer
+
+  Future<void> _playSegment(String filePath) async {
+    if (currentPlayingFile != filePath) {
+      await _audioPlayer.stop(); // Stop any currently playing audio
+      await _audioPlayer.play(DeviceFileSource(filePath)); // Play the selected audio file
       setState(() {
-        audioFile = result.files.single.name;
+        isCurrentPlaying = true;
+        currentPlayingFile = filePath; // Update current playing file
       });
     }
   }
+  Future<void> _stopPlayback() async {
+    await _audioPlayer.stop();
+    setState(() {
+      isCurrentPlaying = false;
+      currentPlayingFile = null; // Clear current playing file
+    });
+  }
+  Future<void> _downloadFile(BuildContext context, String filePath) async {
+    var status = await Permission.storage.request(); // Request storage permissions
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +99,7 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
                 ? _buildUploadDocumentSection(controller)
                 : SizedBox.shrink(),
             (controller.orderDetailsModel!.data?.audios?.length ?? 0) != 0
-                ? _buildAudioSection()
+                ? _buildAudioSection(controller)
                 : SizedBox.shrink(),
             SizedBox(height: 15),
             Row(
@@ -228,50 +250,131 @@ class _MyOrderDetailsScreeneState extends State<MyOrderDetailsScreen> {
           children: [
             Icon(Icons.photo, color: brandGreyColor),
             SizedBox(width: 5),
-            SizedBox(
-                height: 100,
-                width: 150,
+            // Conditional rendering of the image based on _isImageVisible
+            if (_isImageVisible) // Check if the image should be visible
+              SizedBox(
+                width: 100,
                 child: Image.network(
                   controller.orderDetailsModel!.data?.images?[0].image ?? "",
                   fit: BoxFit.cover,
-                ) // Hides the widget if no image is available
                 ),
-            SizedBox(width: 5),
-            Icon(Icons.download, color: brandGreyColor),
-            SizedBox(width: 5),
-            Icon(Icons.remove_red_eye, color: brandGreyColor),
+              )
+            else // If the image is not visible, show the text
+              GestureDetector( // Use GestureDetector for click functionality
+                onTap: () {
+                  setState(() {
+                    _isImageVisible = true; // Toggle visibility to show the image
+                  });
+                },
+                child: Text(
+                  'photo.01.jpg', // Displaying the text when image is hidden
+                  style: order_style2,
+                ),
+              ),
+            IconButton(
+              icon: Icon(Icons.download, color: brandGreyColor),
+              onPressed: () {
+                // Implement download functionality here
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.visibility),
+              onPressed: () {
+                setState(() {
+                  _isImageVisible = !_isImageVisible; // Toggle visibility
+                });
+              },
+            ),
           ],
         ),
+
+
       ],
     );
   }
 
 // Widget for Audio Section
-  Widget _buildAudioSection() {
+  Widget _buildAudioSection(OrderController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: 15),
         Text('Audio File', style: order_style),
         SizedBox(height: 5),
-        Container(
-          child: Row(
-            children: [
-              Icon(Icons.volume_up_rounded, color: brandGreyColor),
-              SizedBox(width: 5),
-              Text(
-                'audio.01.mp4',
-                style: order_style2,
-              ),
-              SizedBox(width: 5),
-              Icon(Icons.download, color: brandGreyColor),
-              SizedBox(width: 5),
-              Icon(Icons.play_arrow, color: brandGreyColor),
-            ],
+        SizedBox(
+          height: controller.orderDetailsModel!.data?.audios?.isNotEmpty == true ? 100 : 50,
+          child: controller.orderDetailsModel!.data?.audios?.isEmpty == true
+              ? Center(child: Text("No recorded files available"))
+              : ListView.builder(
+            scrollDirection: Axis.vertical,
+            itemCount: controller.orderDetailsModel!.data?.audios?.length ?? 0,
+            itemBuilder: (context, index) {
+              final audioFile = controller.orderDetailsModel!.data!.audios![index].audio ?? "";
+
+              return Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        isCurrentPlaying && currentPlayingFile == audioFile
+                            ? Icons.volume_up_rounded
+                            : Icons.volume_mute,
+                        color: brandGreyColor,
+                      ),
+                      onPressed: () {
+                        if (isCurrentPlaying && currentPlayingFile == audioFile) {
+                          _stopPlayback();
+                        } else {
+                          _playSegment(audioFile);
+                        }
+                      },
+                    ),
+                    SizedBox(width: 5),
+                    Text(
+                     'Audio.001.mp3', // Pass the audio file path as an argument
+                      style: order_style2,
+                    ),
+
+                    IconButton(
+                      icon: Icon(Icons.download, color: brandGreyColor),
+                      onPressed: () {
+                        _downloadFile(context, audioFile); // Provide the correct audio file
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        isCurrentPlaying && currentPlayingFile == audioFile
+                            ? Icons.stop
+                            : Icons.play_arrow,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        if (isCurrentPlaying && currentPlayingFile == audioFile) {
+                          _stopPlayback();
+                        } else {
+                          _playSegment(audioFile); // Provide the correct audio file
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
-        ),
+        )
+
+
+
       ],
     );
+  }
+  String getLastFileNameWithExtension(int nextNumber) {
+    if (nextNumber >= 0) {
+      // Generate a new file name based on the next number
+      return "Audio_${nextNumber.toString().padLeft(3, '0')}.mp4"; // Format: Audio_001.mp4
+    }
+    return "No file selected"; // Default message when no valid number is provided
   }
 
 // Widget for Description Content Box

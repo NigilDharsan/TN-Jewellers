@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:TNJewellers/src/OderScreen/controller/OrderController.dart';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:TNJewellers/utils/styles.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class OrderScreenThree extends StatefulWidget {
   const OrderScreenThree({super.key});
@@ -15,6 +20,24 @@ class OrderScreenThree extends StatefulWidget {
 class _OrderScreenThreeState extends State<OrderScreenThree> {
   String? audioFile;
   int currentStep = 3;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  bool isCurrentPlaying = false;
+  String? currentPlayingFile;
+  bool isLoading = false;
+
+
+  @override
+  void initState() {
+    super.initState();
+    // Listen for completion of audio playback
+    _audioPlayer.onPlayerComplete.listen((event) {
+      setState(() {
+        isCurrentPlaying = false;
+        currentPlayingFile = null; // Clear current playing file
+        isLoading = false; // Stop loading indicator
+      });
+    });
+  }
 
   void pickAudioFile() async {
     FilePickerResult? result =
@@ -26,6 +49,77 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
     }
   }
 
+  Future<void> _downloadFile(BuildContext context, String filePath) async {
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      await Permission.storage.request();
+      if (!(await Permission.storage.isGranted)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Storage permission denied!")),
+        );
+        return;
+      }
+    }
+    try {
+      Directory? directory = await getExternalStorageDirectory();
+      String newPath = "";
+      if (directory != null) {
+        List<String> paths = directory.path.split("/");
+        for (int i = 1; i < paths.length; i++) {
+          String folder = paths[i];
+          if (folder != "Android") {
+            newPath += "/$folder";
+          } else {
+            break;
+          }
+        }
+        newPath = "$newPath/Download"; // Saving to Download folder
+        directory = Directory(newPath);
+      }
+
+      if (!await directory!.exists()) {
+        await directory.create(recursive: true);
+      }
+      String fileName = filePath.split('/').last;
+      File sourceFile = File(filePath);
+      File newFile = File("${directory?.path}/$fileName");
+      await sourceFile.copy(newFile.path);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Download successful!'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Download failed: ${e.toString()}'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+  Future<void> _playSegment(String filePath) async {
+    if (currentPlayingFile != filePath) {
+      setState(() {
+        isLoading = true; // Start loading indicator
+      });
+      await _audioPlayer.stop(); // Stop any currently playing audio
+      await _audioPlayer.play(DeviceFileSource(filePath)); // Play the selected audio file
+      setState(() {
+        isCurrentPlaying = true;
+        currentPlayingFile = filePath; // Update current playing file
+      });
+    }
+  }
+  Future<void> _stopPlayback() async {
+    await _audioPlayer.stop();
+    setState(() {
+      isCurrentPlaying = false;
+      currentPlayingFile = null; // Clear current playing file
+      isLoading = false; // Stop loading indicator
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return GetBuilder<OrderController>(builder: (controller) {
@@ -54,10 +148,10 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
                   ),
                 ],
               ),
-              controller.selectedFiles.length != 0
+              controller.selectedFiles.isNotEmpty
                   ? _buildUploadDocumentSection(controller)
                   : SizedBox.shrink(),
-              controller.recordedFiles.length != 0
+              controller.recordedFiles.isNotEmpty
                   ? _buildAudioSection(controller)
                   : SizedBox.shrink(),
               SizedBox(height: 15),
@@ -172,26 +266,58 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
             itemCount: controller.selectedFiles.length,
             itemBuilder: (context, index) {
               return SizedBox(
-                height: 30,
-                child: Row(
-                  children: [
-                    Icon(Icons.photo, color: brandGreyColor),
-                    SizedBox(width: 5),
-                    SizedBox(
-                      width: 100,
-                      child: Text(
-                        getLastFileNameWithExtension(
-                            controller.selectedFiles[index]['path']),
-                        style: order_style2,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
+                  height: 30,
+                  child: Row(
+                    children: [
+                      Icon(Icons.photo, color: brandGreyColor),
+                      SizedBox(width: 5),
+                      SizedBox(
+                        width: 100,
+                        child: Text(
+                          getLastFileNameWithExtension(
+                              controller.selectedFiles[index]['path']),
+                          style: order_style2,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
                       ),
-                    ),
-                    Icon(Icons.download, color: brandGreyColor),
-                    Icon(Icons.remove_red_eye, color: brandGreyColor),
-                  ],
-                ),
-              );
+                      IconButton(
+                        icon: Icon(Icons.download, color: brandGreyColor),
+                        onPressed: () {
+                          _downloadFile(
+                              context, controller.selectedFiles[index]['path']);
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          controller.selectedFiles[index]['obscureimage'] ??
+                                  true
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: brandGreyColor,
+                        ),
+                        onPressed: () {
+                          controller.selectedFiles[index]['obscureimage'] =
+                              !(controller.selectedFiles[index]
+                                      ['obscureimage'] ??
+                                  true);
+                          controller.update(); // Update the controller state
+                        },
+                      ),
+                      if (!(controller.selectedFiles[index]['obscureimage'] ??
+                          true)) ...[
+                        SizedBox(
+                          height: 100,
+                          width: 100,
+                          child: Image.file(
+                            File(controller.selectedFiles[index]['path']),
+                            fit: BoxFit
+                                .cover, // Adjust the image to fill the container
+                          ),
+                        ),
+                      ],
+                    ],
+                  ));
             },
           ),
         ),
@@ -215,29 +341,68 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
         Text('Audio File', style: order_style),
         SizedBox(height: 5),
         SizedBox(
-          height:
-              controller.selectedFiles.length * 50, // Adjust height as needed
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: controller.selectedFiles.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: Row(
-                  children: [
-                    Icon(Icons.volume_up, color: brandGreyColor),
-                    SizedBox(width: 5),
-                    Text(
-                        getLastFileNameWithExtension(
-                            controller.recordedFiles[index]),
-                        style: order_style2),
-                    Icon(Icons.download, color: brandGreyColor),
-                    Icon(Icons.play_arrow, color: brandGreyColor),
-                  ],
+          height: controller.recordedFiles.isNotEmpty
+              ? controller.recordedFiles.length * 50
+              : 50, // Ensure a minimum height
+          child: controller.recordedFiles.isEmpty
+              ? Center(child: Text("No recorded files available"))
+              : ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  itemCount:
+                      controller.recordedFiles.length, // Use the same list
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: Row(
+                        children: [
+                          Icon(Icons.volume_up, color: brandGreyColor),
+                          SizedBox(width: 5),
+                          Text(
+                            getLastFileNameWithExtension(
+                                controller.recordedFiles[index]),
+                            style: order_style2,
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.download, color: brandGreyColor),
+                            onPressed: () {
+                              _downloadFile(
+                                  context, controller.recordedFiles[index]);
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              isCurrentPlaying && currentPlayingFile == controller.recordedFiles[index]
+                                  ? Icons.stop
+                                  : Icons.play_arrow,
+                              color: Colors.grey,
+                            ),
+                            onPressed: () {
+                              if (isCurrentPlaying && currentPlayingFile == controller.recordedFiles[index]) {
+                                _stopPlayback();
+                              } else {
+                                _playSegment(controller.recordedFiles[index]);
+                              }
+                            },
+                          ),
+                          SizedBox(
+                            width: 60, // Fixed width to prevent shifting
+                            child: (isCurrentPlaying && currentPlayingFile == controller.recordedFiles[index])
+                                ? LinearProgressIndicator(
+                              minHeight: 5,
+                              backgroundColor: Colors.grey[300],
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue), // Change color as needed
+                            )
+                                : Container(
+                              height: 2, // Placeholder Line when not playing
+                              color: Colors.grey.withOpacity(0.5),
+                            ),
+                          ),
+
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
         ),
       ],
     );
