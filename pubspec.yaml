@@ -63,9 +63,6 @@ dependencies:
 
   audioplayers:
 
-
-
-
   geolocator:
   url_launcher:
   pin_code_fields:
@@ -75,6 +72,8 @@ dependencies:
   flutter_polyline_points:
   flutter_typeahead:
   sliding_up_panel:
+
+  easy_image_viewer:
 
 dev_dependencies:
   flutter_test:

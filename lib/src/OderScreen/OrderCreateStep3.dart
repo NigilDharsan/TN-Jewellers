@@ -4,6 +4,7 @@ import 'package:TNJewellers/src/OderScreen/controller/OrderController.dart';
 import 'package:TNJewellers/utils/colors.dart';
 import 'package:TNJewellers/utils/styles.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -24,7 +25,6 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
   bool isCurrentPlaying = false;
   String? currentPlayingFile;
   bool isLoading = false;
-
 
   @override
   void initState() {
@@ -99,19 +99,22 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
       );
     }
   }
+
   Future<void> _playSegment(String filePath) async {
     if (currentPlayingFile != filePath) {
       setState(() {
         isLoading = true; // Start loading indicator
       });
       await _audioPlayer.stop(); // Stop any currently playing audio
-      await _audioPlayer.play(DeviceFileSource(filePath)); // Play the selected audio file
+      await _audioPlayer
+          .play(DeviceFileSource(filePath)); // Play the selected audio file
       setState(() {
         isCurrentPlaying = true;
         currentPlayingFile = filePath; // Update current playing file
       });
     }
   }
+
   Future<void> _stopPlayback() async {
     await _audioPlayer.stop();
     setState(() {
@@ -120,6 +123,7 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
       isLoading = false; // Stop loading indicator
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return GetBuilder<OrderController>(builder: (controller) {
@@ -297,25 +301,16 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
                           color: brandGreyColor,
                         ),
                         onPressed: () {
-                          controller.selectedFiles[index]['obscureimage'] =
-                              !(controller.selectedFiles[index]
-                                      ['obscureimage'] ??
-                                  true);
-                          controller.update(); // Update the controller state
+                          showImageViewer(
+                            context,
+                            FileImage(
+                              File(controller.selectedFiles[index]['path']),
+                            ),
+                            swipeDismissible: true,
+                            doubleTapZoomable: true,
+                          );
                         },
                       ),
-                      if (!(controller.selectedFiles[index]['obscureimage'] ??
-                          true)) ...[
-                        SizedBox(
-                          height: 100,
-                          width: 100,
-                          child: Image.file(
-                            File(controller.selectedFiles[index]['path']),
-                            fit: BoxFit
-                                .cover, // Adjust the image to fill the container
-                          ),
-                        ),
-                      ],
                     ],
                   ));
             },
@@ -371,13 +366,17 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
                           ),
                           IconButton(
                             icon: Icon(
-                              isCurrentPlaying && currentPlayingFile == controller.recordedFiles[index]
+                              isCurrentPlaying &&
+                                      currentPlayingFile ==
+                                          controller.recordedFiles[index]
                                   ? Icons.stop
                                   : Icons.play_arrow,
                               color: Colors.grey,
                             ),
                             onPressed: () {
-                              if (isCurrentPlaying && currentPlayingFile == controller.recordedFiles[index]) {
+                              if (isCurrentPlaying &&
+                                  currentPlayingFile ==
+                                      controller.recordedFiles[index]) {
                                 _stopPlayback();
                               } else {
                                 _playSegment(controller.recordedFiles[index]);
@@ -386,18 +385,21 @@ class _OrderScreenThreeState extends State<OrderScreenThree> {
                           ),
                           SizedBox(
                             width: 60, // Fixed width to prevent shifting
-                            child: (isCurrentPlaying && currentPlayingFile == controller.recordedFiles[index])
+                            child: (isCurrentPlaying &&
+                                    currentPlayingFile ==
+                                        controller.recordedFiles[index])
                                 ? LinearProgressIndicator(
-                              minHeight: 5,
-                              backgroundColor: Colors.grey[300],
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue), // Change color as needed
-                            )
+                                    minHeight: 5,
+                                    backgroundColor: Colors.grey[300],
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.blue), // Change color as needed
+                                  )
                                 : Container(
-                              height: 2, // Placeholder Line when not playing
-                              color: Colors.grey.withOpacity(0.5),
-                            ),
+                                    height:
+                                        2, // Placeholder Line when not playing
+                                    color: Colors.grey.withOpacity(0.5),
+                                  ),
                           ),
-
                         ],
                       ),
                     );
